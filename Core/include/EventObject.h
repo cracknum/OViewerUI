@@ -1,24 +1,30 @@
 #ifndef INTERFACE_EVENT_OBJECT_H
 #define INTERFACE_EVENT_OBJECT_H
-#include <memory>
+#include "EventData.h"
+#include "EventId.h"
 class UIObject;
 class EventObject
 {
 public:
-  EventObject()
-    : m_Caller(nullptr)
+  explicit EventObject(const EventId& eventId, std::unique_ptr<EventData> eventData)
+    : mEventId(eventId)
+    , mEventData(std::move(eventData))
   {
+
   }
-  explicit EventObject(const std::shared_ptr<UIObject>& caller)
-    : m_Caller(caller)
+
+  virtual ~EventObject() = default;
+  [[nodiscard]] EventId eventId() const
   {
+    return mEventId;
   }
-  std::shared_ptr<UIObject> caller()
+  [[nodiscard]] const EventData* eventData() const
   {
-    return m_Caller;
+    return mEventData.get();
   }
 
 protected:
-  std::shared_ptr<UIObject> m_Caller;
+  EventId mEventId;
+  std::unique_ptr<EventData> mEventData;
 };
 #endif // INTERFACE_EVENT_OBJECT_H

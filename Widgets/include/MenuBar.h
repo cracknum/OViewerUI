@@ -5,16 +5,35 @@
 #include <string>
 #include <vector>
 #include "WidgetsExport.h"
+#include "IEventObserver.h"
+#include "EventObject.h"
+class MenuItemClicked final: public EventObject
+{
+public:
+  MenuItemClicked(const EventId& eventId, std::unique_ptr<EventData> eventData);
+  ~MenuItemClicked() override = default;
+};
+
+class MenuItemData final: public EventData
+{
+public:
+  explicit MenuItemData(std::string menuItemName);
+  ~MenuItemData() override = default;
+
+  [[nodiscard]] std::string menuItemName() const;
+private:
+  std::string mMenuItemName;
+};
 class WIDGETS_API MenuBar final : public Widget
 {
 public:
   class Menu
   {
   public:
-    class Item
+    class Item final: public UIObject
     {
     public:
-      void setName(const std::string& name);
+      Item(std::string  name, const std::shared_ptr<IEventObserver>& observer);
 
     private:
       friend class MenuBar;

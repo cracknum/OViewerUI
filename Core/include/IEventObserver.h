@@ -2,11 +2,11 @@
 #define INTERFACE_EVENT_LISTENER_H
 
 class EventObject;
-class IEventListener
+class IEventObserver
 {
 public:
   virtual bool handle(const EventObject& event) = 0;
-  virtual ~IEventListener() = default;
+  virtual ~IEventObserver() = default;
 };
 
 #endif // INTERFACE_EVENT_LISTENER_H

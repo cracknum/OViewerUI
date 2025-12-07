@@ -1,16 +1,30 @@
 #include "MenuBar.h"
 #include <imgui.h>
+#include <utility>
 #include <vector>
 #include <spdlog/spdlog.h>
+#include "EventId.h"
 
 struct MenuBar::Impl final
 {
   std::vector<Menu> mMenus;
 };
 
-void MenuBar::Menu::Item::setName(const std::string& name)
+MenuItemClicked::MenuItemClicked(const EventId& eventId, std::unique_ptr<EventData> eventData)
+  : EventObject(eventId, std::move(eventData))
 {
-  this->mName = name;
+}
+MenuItemData::MenuItemData(std::string  menuItemName)
+  :mMenuItemName(std::move(menuItemName))
+{}
+std::string MenuItemData::menuItemName() const
+{
+  return mMenuItemName;
+}
+MenuBar::Menu::Item::Item(std::string  name, const std::shared_ptr<IEventObserver>& observer)
+  :mName(std::move(name))
+{
+  addObserver(observer);
 }
 void MenuBar::Menu::setName(const std::string& name)
 {
@@ -31,15 +45,15 @@ bool MenuBar::Render()
   if (ImGui::BeginMainMenuBar())
   {
     // BeginMenu()只有成功后才需要调用EndMenu()
-    for (const auto& menu : mImpl->mMenus)
+    for (auto& menu : mImpl->mMenus)
     {
       if (ImGui::BeginMenu(menu.mName.c_str()))
       {
-        for (const auto& item: menu.mMenuItems)
+        for (auto& item: menu.mMenuItems)
         {
           if (ImGui::MenuItem(item.mName.c_str()))
           {
-            SPDLOG_DEBUG("item clicked: {}.{}", menu.mName, item.mName);
+            item.invokeEvent(MenuItemClicked(EventId::MenuItemClicked, std::make_unique<MenuItemData>(item.mName)));
           }
         }
         ImGui::EndMenu();

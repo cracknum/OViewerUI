@@ -1,9 +1,7 @@
 #ifndef PROPERTY_PANEL_H
 #define PROPERTY_PANEL_H
 #include <memory>
-#include <string>
 #include "WidgetsExport.h"
-#include <functional>
 
 class SceneView;
 

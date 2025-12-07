@@ -3,11 +3,24 @@
 #include <imfilebrowser.h>
 #include <imgui.h>
 #include "MenuBar.h"
+#include "IEventObserver.h"
+#include <spdlog/spdlog.h>
+
+class MenuItemClickedObserver final: public IEventObserver
+{
+public:
+  bool handle(const EventObject& event) override
+  {
+    auto data = dynamic_cast<const MenuItemData*>(event.eventData());
+    SPDLOG_DEBUG("item clicked, event type: {}, address: {}", EventIdStr[static_cast<int>(event.eventId())], data->menuItemName());
+    return true;
+  }
+};
+
 
 struct SceneView::Impl final {
   // create a file browser instance
   ImGui::FileBrowser mFileDialog;
-  std::function<void(const std::string &)> mMeshLoadCallback;
   std::string mCurrentFile;
   ImGuiContext *mContext{};
   std::unique_ptr<MenuBar> mMenuBar;
@@ -27,10 +40,8 @@ SceneView::SceneView(ImGuiContext *context) {
   mImpl->mMenuBar = std::make_unique<MenuBar>();
   MenuBar::Menu menu;
   menu.setName("File");
-  MenuBar::Menu::Item item1;
-  item1.setName("open");
-  MenuBar::Menu::Item item2;
-  item2.setName("close");
+  MenuBar::Menu::Item item1("open", std::make_shared<MenuItemClickedObserver>());
+  MenuBar::Menu::Item item2("close", std::make_shared<MenuItemClickedObserver>());
 
   menu.addItem(item1);
   menu.addItem(item2);
