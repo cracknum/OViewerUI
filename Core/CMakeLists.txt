@@ -19,4 +19,5 @@ set(header_files
 
 add_library(${PROJECT_NAME} SHARED ${source_files} ${header_files})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
 target_compile_definitions(${PROJECT_NAME} PRIVATE CORE_EXPORTS)

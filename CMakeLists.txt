@@ -11,8 +11,7 @@ find_package(imgui CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
-find_package(VTK REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 add_subdirectory(third_party)
 configure_file(cmake/config.h.in config.h @ONLY)
@@ -20,6 +19,13 @@ set(CONFIG_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# for spdlog print debug info
+set(ENABLE_DEBUG ON)
+
+if (ENABLE_DEBUG)
+    add_definitions(-DSPDLOG_ACTIVE_LEVEL=1)
+endif()
 
 add_subdirectory(Core)
 add_subdirectory(Widgets)

@@ -2,6 +2,7 @@
 #include "imgui_internal.h"
 #include <imfilebrowser.h>
 #include <imgui.h>
+#include "MenuBar.h"
 
 struct SceneView::Impl final {
   // create a file browser instance
@@ -9,6 +10,7 @@ struct SceneView::Impl final {
   std::function<void(const std::string &)> mMeshLoadCallback;
   std::string mCurrentFile;
   ImGuiContext *mContext{};
+  std::unique_ptr<MenuBar> mMenuBar;
 
   const char *UI_DOCK_WINDOW = "##ui.dock_window";
   const char *UI_PROJECT_BOX = "Project##ui.project";
@@ -22,6 +24,18 @@ struct SceneView::Impl final {
 SceneView::SceneView(ImGuiContext *context) {
   mImpl = std::make_unique<Impl>();
   mImpl->mContext = context;
+  mImpl->mMenuBar = std::make_unique<MenuBar>();
+  MenuBar::Menu menu;
+  menu.setName("File");
+  MenuBar::Menu::Item item1;
+  item1.setName("open");
+  MenuBar::Menu::Item item2;
+  item2.setName("close");
+
+  menu.addItem(item1);
+  menu.addItem(item2);
+
+  mImpl->mMenuBar->addMenu(menu);
 }
 
 SceneView::~SceneView() = default;
@@ -54,12 +68,7 @@ void SceneView::render(SceneView *mScene) const {
   ImGui::Begin(mImpl->UI_DOCK_WINDOW, nullptr, windowFlags); // 开始停靠窗口
   ImGui::PopStyleVar(3);                        // 弹出样式设置
 
-    if (ImGui::BeginMainMenuBar()) {
-      if (ImGui::BeginMenu("File")) {
-        ImGui::EndMenu();
-      }
-      ImGui::EndMainMenuBar();
-    }
+  mImpl->mMenuBar->Render();
   // 创建停靠空间
   if (ImGui::GetIO().ConfigFlags &
       ImGuiConfigFlags_DockingEnable) { // 判断是否开启停靠

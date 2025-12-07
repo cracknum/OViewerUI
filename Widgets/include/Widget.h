@@ -1,10 +1,11 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 #include "UIObject.h"
-class Widget : public UIObject{
+#include "WidgetsExport.h"
+class WIDGETS_API Widget : public UIObject{
 public:
   virtual bool Render() = 0;
-  ~Widget() override;
+  ~Widget() override = default;
 };
 
 #endif // WIDGET_H

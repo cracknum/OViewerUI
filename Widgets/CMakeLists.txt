@@ -17,7 +17,6 @@ set(header_files
         include/Application.hpp
         include/OpenGLWindow.hpp
 )
-set(vtk_Libs VTK::RenderingOpenGL2 VTK::InteractionStyle VTK::CommonColor )
 
 add_library(${PROJECT_NAME} SHARED ${source_files} ${header_files})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
@@ -26,10 +25,9 @@ target_link_libraries(
         glm::glm
         imgui::imgui
         ImGuiHelper
-        ${vtk_Libs}
         glad::glad
         Core
         GL
+        spdlog::spdlog
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE WIDGETS_EXPORTS)
-vtk_module_autoinit(TARGETS ${PROJECT_NAME} MODULES ${vtk_Libs})
