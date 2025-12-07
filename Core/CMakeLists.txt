@@ -20,3 +20,5 @@ add_library(${PROJECT_NAME} SHARED ${source_files} ${header_files})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog)
 target_compile_definitions(${PROJECT_NAME} PRIVATE CORE_EXPORTS)
+
+add_library(${frame_work_name}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

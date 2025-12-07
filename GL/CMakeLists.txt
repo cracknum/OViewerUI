@@ -20,3 +20,4 @@ target_link_libraries(
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GL_EXPORTS)
+add_library(${frame_work_name}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

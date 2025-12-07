@@ -31,3 +31,4 @@ target_link_libraries(
         spdlog::spdlog
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE WIDGETS_EXPORTS)
+add_library(${frame_work_name}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

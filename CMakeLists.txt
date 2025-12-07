@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.19...3.22)
 
-set(CMAKE_TOOLCHAIN_FILE "F:/Workspace/github/vcpkg/scripts/buildsystems/vcpkg.cmake")
 project(RenderFramework)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -20,6 +19,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+set(frame_work_name ${PROJECT_NAME})
+
 # for spdlog print debug info
 set(ENABLE_DEBUG ON)
 
@@ -31,3 +32,5 @@ add_subdirectory(Core)
 add_subdirectory(Widgets)
 add_subdirectory(GL)
 add_subdirectory(Test)
+
+
