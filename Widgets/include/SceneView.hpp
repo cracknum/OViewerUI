@@ -1,36 +1,31 @@
-#ifndef SCENE_VIEW_H
-#define SCENE_VIEW_H
-#include <cstdint>
-#include <glm/vec2.hpp>
+#ifndef PROPERTY_PANEL_H
+#define PROPERTY_PANEL_H
 #include <memory>
 #include <string>
 #include "WidgetsExport.h"
+#include <functional>
 
-class Light;
-class Shader;
-class OpenGLFrameBuffer;
-class Mesh;
-class Camera;
-class WIDGETS_API SceneView {
+class SceneView;
+
+struct ImGuiContext;
+
+class WIDGETS_API SceneView
+{
 public:
-  SceneView();
-  ~SceneView();
+    explicit SceneView(ImGuiContext* context);
+    ~SceneView();
 
-  Light *getLight() const;
+    void render(SceneView *mScene = nullptr) const;
 
-  void resize(uint32_t width, uint32_t height);
-  void render();
-  void loadMesh(const std::string &filepath);
-  void setMesh(std::shared_ptr<Mesh> mesh);
-  std::shared_ptr<Mesh> getMesh();
-  void resetView();
+    SceneView(const SceneView &) = delete;
+    SceneView &operator=(const SceneView &) = delete;
+
+    SceneView(SceneView &&) noexcept ;
+    SceneView &operator=(SceneView &&) noexcept ;
 
 private:
-  std::unique_ptr<Camera> mCamera;
-  std::unique_ptr<OpenGLFrameBuffer> mFrameBuffer;
-  std::unique_ptr<Shader> mShader;
-  std::unique_ptr<Light> mLight;
-  std::shared_ptr<Mesh> mMesh;
-  glm::vec2 mSize;
+    struct Impl;
+    std::unique_ptr<Impl> mImpl;
 };
+
 #endif

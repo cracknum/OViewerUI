@@ -1,4 +1,4 @@
-#include "Application.hpp"
+#include "../Widgets/include/Application.hpp"
 int main(int argc, char** argv)
 {
     Application app(argc, argv);

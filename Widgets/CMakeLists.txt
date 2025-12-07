@@ -6,21 +6,30 @@ set(PROJECT_VERSION_PATCH 1)
 
 set(source_files
         src/SceneView.cpp
-        src/PropertyPanel.cpp
+        src/MenuBar.cpp
+        src/Application.cpp
+        src/OpenGLWindow.cpp
 )
 
 set(header_files
         include/SceneView.hpp
-        include/PropertyPanel.hpp
+        include/MenuBar.h
+        include/Application.hpp
+        include/OpenGLWindow.hpp
 )
+set(vtk_Libs VTK::RenderingOpenGL2 VTK::InteractionStyle VTK::CommonColor )
 
 add_library(${PROJECT_NAME} SHARED ${source_files} ${header_files})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(
         ${PROJECT_NAME} PUBLIC
-        glm
-        Elements
+        glm::glm
         imgui::imgui
         ImGuiHelper
+        ${vtk_Libs}
+        glad::glad
+        Core
+        GL
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE WIDGETS_EXPORTS)
+vtk_module_autoinit(TARGETS ${PROJECT_NAME} MODULES ${vtk_Libs})

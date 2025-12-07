@@ -1,69 +1,192 @@
 #include "SceneView.hpp"
-
-#include "Camera.h"
-#include "Light.hpp"
-#include "Mesh.hpp"
-#include "OpenGLFrameBuffer.hpp"
-#include "Shader.hpp"
-
+#include "imgui_internal.h"
+#include <imfilebrowser.h>
 #include <imgui.h>
 
-#include <utility>
-SceneView::SceneView():   mCamera(nullptr), mFrameBuffer(nullptr), mShader(nullptr),
-  mLight(nullptr), mSize(800, 600)
-{
-  mFrameBuffer = std::make_unique<OpenGLFrameBuffer>();
-  mFrameBuffer->createBuffers(800, 600);
-  mShader = std::make_unique<Shader>();
-  mShader->load("shaders/vs.shader", "shaders/fs_pbr.shader");
-  mLight = std::make_unique<Light>();
+struct SceneView::Impl final {
+  // create a file browser instance
+  ImGui::FileBrowser mFileDialog;
+  std::function<void(const std::string &)> mMeshLoadCallback;
+  std::string mCurrentFile;
+  ImGuiContext *mContext{};
 
-  mCamera = std::make_unique<Camera>(glm::vec3(0, 0, 3), 45.0f, 1.3f, 0.1f, 100.0f);
+  const char *UI_DOCK_WINDOW = "##ui.dock_window";
+  const char *UI_PROJECT_BOX = "Project##ui.project";
+  const char *UI_PROPERTY_BOX = "Properties##ui.property";
+  const char *UI_TOOL_BOX = "Tools##ui.tools";
+  const char *UI_MESSAGE_BOX = "Messages##ui.message";
+  const char *UI_LOG_BOX = "Logs##ui.log";
+  const char *UI_VIEW_BOX = "##ui.view";
+};
 
+SceneView::SceneView(ImGuiContext *context) {
+  mImpl = std::make_unique<Impl>();
+  mImpl->mContext = context;
 }
-SceneView::~SceneView() {
-mShader->unload();
-}
-Light *SceneView::getLight() const {
-  return mLight.get();
-}
-void SceneView::resize(uint32_t width, uint32_t height) {
-  mSize.x = width;
-  mSize.y = height;
-}
-void SceneView::render() {
-  mShader->use();
-  mLight->update(mShader.get());
-  mFrameBuffer->bind();
 
-  if (mMesh) {
-    mMesh->update(mShader.get());
-    mMesh->render();
+SceneView::~SceneView() = default;
+
+void SceneView::render(SceneView *mScene) const {
+  // ImGui跨dll使用时需要共享ImGui::context，不然gImGui为空
+  ImGui::SetCurrentContext(mImpl->mContext);
+  const ImGuiID dockSpaceID = ImGui::GetID("##ui.dock_space1");
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  ImGui::SetNextWindowPos(viewport->WorkPos);
+  ImGui::SetNextWindowSize(viewport->WorkSize);
+  ImGui::SetNextWindowViewport(viewport->ID);
+
+  constexpr int windowFlags = ImGuiWindowFlags_NoDecoration            // 无标题栏、不可改变大小、无滚动条、不可折叠
+                    | ImGuiWindowFlags_NoMove                // 不可移动
+                    | ImGuiWindowFlags_NoBackground          // 无背景（背景透明）
+                    | ImGuiWindowFlags_MenuBar               // 菜单栏
+                    | ImGuiWindowFlags_NoDocking             // 不可停靠
+                    | ImGuiWindowFlags_NoBringToFrontOnFocus // 无法设置前台和聚焦
+                    | ImGuiWindowFlags_NoNavFocus            // 无法通过键盘和手柄聚焦
+      ;
+
+  // 压入样式设置
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f); // 无边框
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
+                      ImVec2(0.0f, 0.0f));                 // 无边界
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f); // 无圆角
+  // ImGui::SetNextWindowBgAlpha(0.0f); // 窗口 alpha 为 0，同样可以不显示背景
+
+  ImGui::Begin(mImpl->UI_DOCK_WINDOW, nullptr, windowFlags); // 开始停靠窗口
+  ImGui::PopStyleVar(3);                        // 弹出样式设置
+
+    if (ImGui::BeginMainMenuBar()) {
+      if (ImGui::BeginMenu("File")) {
+        ImGui::EndMenu();
+      }
+      ImGui::EndMainMenuBar();
+    }
+  // 创建停靠空间
+  if (ImGui::GetIO().ConfigFlags &
+      ImGuiConfigFlags_DockingEnable) { // 判断是否开启停靠
+    // 判断是否有根节点，防止一直重建
+    if (!ImGui::DockBuilderGetNode(dockSpaceID)) {
+      // 移除根节点
+      ImGui::DockBuilderRemoveNode(dockSpaceID);
+
+      // 创建根节点
+      ImGuiID root =
+          ImGui::DockBuilderAddNode(dockSpaceID, ImGuiDockNodeFlags_None);
+
+      // 设置根节点位置大小
+      ImGui::DockBuilderSetNodePos(root, {0.0f, 0.0f});
+      ImGui::DockBuilderSetNodeSize(root, viewport->WorkSize);
+
+      // 根节点分割左节点
+      const ImGuiID leftNode = ImGui::DockBuilderSplitNode(root, ImGuiDir_Left, 0.25f,
+                                                     nullptr, &root);
+
+      // 根节点分割右节点
+      const ImGuiID rightNode = ImGui::DockBuilderSplitNode(
+          root, ImGuiDir_Right, 0.25f / 0.75f, nullptr, &root);
+
+      // 根节点分割下节点
+      const ImGuiID bottomNode = ImGui::DockBuilderSplitNode(root, ImGuiDir_Down,
+                                                       0.25f, nullptr, &root);
+
+      // 左节点分割上下节点
+      ImGuiID leftTopNode, leftBottomNode;
+      ImGui::DockBuilderSplitNode(leftNode, ImGuiDir_Up, 0.5f, &leftTopNode,
+                                  &leftBottomNode);
+
+
+      // 设置分割到最后的根节点隐藏标签栏
+      ImGui::DockBuilderGetNode(root)->LocalFlags |=
+          ImGuiDockNodeFlags_HiddenTabBar;
+
+      // 设置节点停靠窗口
+      ImGui::DockBuilderDockWindow(mImpl->UI_PROJECT_BOX, leftTopNode);     // 左上节点
+      ImGui::DockBuilderDockWindow(mImpl->UI_PROPERTY_BOX, leftBottomNode); // 左下节点
+      ImGui::DockBuilderDockWindow(mImpl->UI_TOOL_BOX, rightNode);          // 右边节点
+
+      ImGui::DockBuilderDockWindow(mImpl->UI_MESSAGE_BOX,
+                                   bottomNode); // 下面节点同时停靠两个窗口
+      ImGui::DockBuilderDockWindow(mImpl->UI_LOG_BOX, bottomNode);
+
+      ImGui::DockBuilderDockWindow(
+          mImpl->UI_VIEW_BOX, root); // 观察窗口平铺“客户区”，停靠的节点是 CentralNode
+
+      // 结束停靠设置
+      ImGui::DockBuilderFinish(dockSpaceID);
+
+      // 设置焦点窗口
+      ImGui::SetWindowFocus(mImpl->UI_VIEW_BOX);
+    }
+
+    // 创建停靠空间
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+    ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg,
+                          ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::DockSpace(dockSpaceID, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor();
   }
+  ImGui::End(); // 结束停靠窗口
 
-  mFrameBuffer->unbind();
-  ImGui::Begin("Scene");
-  ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-  mSize = {viewportPanelSize.x, viewportPanelSize.y};
-  mCamera->setAspect(mSize.x / mSize.y);
-  mCamera->update(mShader.get());
-
-  uint64_t textureID = mFrameBuffer->getTexture();
-  ImGui::Image(static_cast<ImTextureID>(textureID), ImVec2(mSize.x, mSize.y), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+  // 工程框
+  if (ImGui::Begin(mImpl->UI_PROJECT_BOX)) {
+    ImGui::LabelText("label", "text");
+    ImGui::Button("button");
+  }
   ImGui::End();
-}
-void SceneView::loadMesh(const std::string &filepath) {
-  if (!mMesh) {
-    mMesh = std::make_shared<Mesh>();
+
+  // 属性框
+  if (ImGui::Begin(mImpl->UI_PROPERTY_BOX)) {
+    ImGui::LabelText("label", "text");
+    ImGui::Button("button");
   }
-  mMesh->load(filepath);
+  ImGui::End();
+
+  // 工具框
+  if (ImGui::Begin(mImpl->UI_TOOL_BOX)) {
+    ImGui::LabelText("label", "text");
+    ImGui::Button("button");
+
+    if (ImGui::Button(u8"reset view")) {
+      // 移除根节点，布局会自动重建
+      ImGui::DockBuilderRemoveNode(dockSpaceID);
+    }
+  }
+  ImGui::End();
+
+  // 消息框
+  if (ImGui::Begin(mImpl->UI_MESSAGE_BOX)) {
+    ImGui::LabelText("label", "text");
+    ImGui::Button("button");
+  }
+  ImGui::End();
+
+  // 日志框
+  if (ImGui::Begin(mImpl->UI_LOG_BOX)) {
+    ImGui::LabelText("label", "text");
+    ImGui::Button("button");
+  }
+  ImGui::End();
+
+  // 观察窗口，背景设置透明，窗口后面就能进行本地 API 的绘制
+  // 压入样式设置
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f); // 无边框
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
+                      ImVec2(0.0f, 0.0f));                 // 无边界
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f); // 无圆角
+  // ImGui::SetNextWindowBgAlpha(0.0f); // 窗口 alpha 为 0，同样可以不显示背景
+
+  if (ImGui::Begin(mImpl->UI_VIEW_BOX, nullptr,
+                   ImGuiWindowFlags_NoBackground)) { // 无背景窗口
+    // 获取窗口坐标
+    const ImVec2 pos = ImGui::GetWindowPos();
+    const ImVec2 size = ImGui::GetWindowSize();
+
+    ImGui::Text("position: %0.2f, %0.2f", pos.x, pos.y);
+    ImGui::Text("size: %0.2f, %0.2f", size.x, size.y);
+  }
+  ImGui::End();
+  ImGui::PopStyleVar(3); // 弹出样式设置
 }
-void SceneView::setMesh(std::shared_ptr<Mesh> mesh) {
-  mMesh = std::move(mesh);
-}
-std::shared_ptr<Mesh> SceneView::getMesh() {
-  return mMesh;
-}
-void SceneView::resetView() {
-  mCamera->reset();
-}
+
+SceneView::SceneView(SceneView &&) noexcept = default;
+SceneView &SceneView::operator=(SceneView &&) noexcept = default;
