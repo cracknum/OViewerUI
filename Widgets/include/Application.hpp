@@ -16,6 +16,8 @@ public:
 
     bool exec();
 
+    static std::string getExecutableDir();
+
 private:
     std::unique_ptr<ApplicationPrivate> mPrivate;
 };
