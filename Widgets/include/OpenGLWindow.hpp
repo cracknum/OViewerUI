@@ -21,6 +21,7 @@ public:
     void setNativeWindow(void *window) override;
     void onResize(int width, int height) override;
     void close() override;
+    void setWindowIcon(const std::string& iconPath);
 
 private:
     std::unique_ptr<WindowPrivate> mPrivate;

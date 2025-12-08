@@ -1,4 +1,4 @@
-#include "../include/OpenGLWindow.hpp"
+#include "OpenGLWindow.hpp"
 #include "OpenGLContext.hpp"
 #include "SceneView.hpp"
 #include "UIContext.hpp"
@@ -6,6 +6,10 @@
 #include <GLFW/glfw3.h>
 // clang-format on
 #include <iostream>
+#include "OpenGLWindow.hpp"
+#include <spdlog/spdlog.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 struct WindowPrivate final {
   bool mIsRunning;
@@ -74,3 +78,26 @@ void OpenGLWindow::onResize(int width, int height) {
 }
 
 void OpenGLWindow::close() { mPrivate->mIsRunning = false; }
+
+void OpenGLWindow::setWindowIcon(const std::string& iconPath) {
+  if (!mPrivate->mWindow)
+  {
+    SPDLOG_ERROR("window is not initialized");
+    return;
+  }
+  
+  int width = 0;
+  int height = 0;
+  int channels = 0;
+  GLFWimage icon;
+  icon.pixels = stbi_load(iconPath.c_str(), &width, &height, &channels, 4);
+  icon.width = width;
+  icon.height = height;
+  if (!icon.pixels)
+  {
+    SPDLOG_ERROR("could not open file: {}, failed reason: {}", iconPath, stbi_failure_reason());
+    return;
+  }
+  
+  glfwSetWindowIcon(mPrivate->mWindow, 1, &icon);
+}

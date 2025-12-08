@@ -11,6 +11,7 @@ public:
   virtual void setNativeWindow(void* window) = 0;
   virtual void onResize(int width, int height) = 0;
   virtual void close() = 0;
+  virtual void setWindowIcon(const std::string& iconPath) = 0;
 
   unsigned int mWidth{};
   unsigned int mHeight{};

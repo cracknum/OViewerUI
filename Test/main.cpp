@@ -5,6 +5,5 @@ int main(int argc, char** argv)
   Application app(argc, argv);
   Log::initLog(spdlog::level::debug);
 
-  app.loop();
-  return 0;
+  return app.exec();
 }

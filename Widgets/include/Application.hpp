@@ -2,6 +2,7 @@
 #define OPENGL_IMGUI_APPLICATION
 #include "WidgetsExport.h"
 #include <memory>
+#include <string>
 
 struct ApplicationPrivate;
 
@@ -11,7 +12,9 @@ public:
     Application(int argc, char **argv);
     ~Application();
 
-    void loop();
+    void setWindowIcon(const std::string& iconPath);
+
+    bool exec();
 
 private:
     std::unique_ptr<ApplicationPrivate> mPrivate;

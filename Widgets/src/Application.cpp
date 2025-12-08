@@ -23,10 +23,16 @@ Application::~Application()
 {
 }
 
-void Application::loop()
+void Application::setWindowIcon(const std::string& iconPath) {
+    mPrivate->mRenderWindow->setWindowIcon(iconPath);
+}
+
+bool Application::exec()
 {
     while(mPrivate->mRenderWindow->isRunning())
     {
         mPrivate->mRenderWindow->render();
     }
+
+    return true;
 }
