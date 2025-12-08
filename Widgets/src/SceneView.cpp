@@ -53,7 +53,7 @@ struct SceneView::Impl final
   std::unique_ptr<ImageNavigatorWidget> mImageNavigatorWidget;
   std::unique_ptr<ImagePropertiesWidget> mImagePropertiesWidget;
   std::unique_ptr<LogWidget> mLogWidget;
-  std::unique_ptr<OpenGLViewerWidget> mViewerWidget;
+  std::shared_ptr<OpenGLViewerWidget> mViewerWidget;
 
   Impl()
     : mDataManagerNode(0)
@@ -69,7 +69,7 @@ struct SceneView::Impl final
     mImageNavigatorWidget = std::make_unique<ImageNavigatorWidget>(UI_IMAGE_NAVIGATOR_WINDOW);
     mImagePropertiesWidget = std::make_unique<ImagePropertiesWidget>(UI_PROPERTIES_WINDOW);
     mLogWidget = std::make_unique<LogWidget>(UI_LOG_BOX);
-    mViewerWidget = std::make_unique<OpenGLViewerWidget>(UI_VIEW_BOX, ImGuiWindowFlags_NoBackground);
+    mViewerWidget = std::make_shared<OpenGLViewerWidget>(UI_VIEW_BOX, ImGuiWindowFlags_NoBackground);
   }
 };
 
@@ -192,3 +192,8 @@ void SceneView::render(SceneView* mScene) const
 
 SceneView::SceneView(SceneView&&) noexcept = default;
 SceneView& SceneView::operator=(SceneView&&) noexcept = default;
+
+std::shared_ptr<OpenGLViewerWidget> SceneView::viewerWidget()
+{
+  return mImpl->mViewerWidget;
+}

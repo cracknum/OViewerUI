@@ -2,8 +2,7 @@
 #define PROPERTY_PANEL_H
 #include <memory>
 #include "WidgetsExport.h"
-
-class SceneView;
+#include "OpenGLViewerWidget.h"
 
 struct ImGuiContext;
 
@@ -19,7 +18,8 @@ public:
     SceneView &operator=(const SceneView &) = delete;
 
     SceneView(SceneView &&) noexcept ;
-    SceneView &operator=(SceneView &&) noexcept ;
+    SceneView &operator=(SceneView &&) noexcept;
+    std::shared_ptr<OpenGLViewerWidget> viewerWidget();
 
 private:
     struct Impl;

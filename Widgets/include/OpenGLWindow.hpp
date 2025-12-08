@@ -4,6 +4,7 @@
 #include "IWindow.hpp"
 #include <memory>
 #include <string>
+#include "SceneView.hpp"
 
 struct WindowPrivate;
 
@@ -22,6 +23,7 @@ public:
     void onResize(int width, int height) override;
     void close() override;
     void setWindowIcon(const std::string& iconPath);
+    std::shared_ptr<SceneView> sceneView();
 
 private:
     std::unique_ptr<WindowPrivate> mPrivate;

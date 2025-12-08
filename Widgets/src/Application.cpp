@@ -61,7 +61,7 @@ std::string getExecutablePath()
 
 struct ApplicationPrivate
 {
-  std::unique_ptr<OpenGLWindow> mRenderWindow;
+  std::shared_ptr<OpenGLWindow> mRenderWindow;
 
   ApplicationPrivate() {}
 };
@@ -69,7 +69,7 @@ struct ApplicationPrivate
 Application::Application(int argc, char** argv)
 {
   mPrivate = std::make_unique<ApplicationPrivate>();
-  mPrivate->mRenderWindow = std::make_unique<OpenGLWindow>();
+  mPrivate->mRenderWindow = std::make_shared<OpenGLWindow>();
   mPrivate->mRenderWindow->init(1920, 1080, "Window");
 }
 
@@ -96,4 +96,9 @@ std::string Application::getExecutableDir()
   if (exePath.empty())
     return "";
   return fs::path(exePath).parent_path().string();
+}
+
+std::shared_ptr<IWindow> Application::renderWindow()
+{
+  return mPrivate->mRenderWindow;
 }

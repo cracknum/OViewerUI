@@ -4,6 +4,8 @@
 #include "WidgetsExport.h"
 #include <memory>
 
+class Renderer;
+
 class WIDGETS_API OpenGLViewerWidget final : public Widget
 {
 public:
@@ -12,6 +14,8 @@ public:
 
   bool Render() override;
 
+  void addRenderer(const std::shared_ptr<Renderer>& renderer);
+  void removeRenderer(const Renderer* renderer);
 private:
   struct Private;
   std::unique_ptr<Private> mPrivate;

@@ -17,7 +17,7 @@ struct WindowPrivate final {
   GLFWwindow *mWindow;
   std::unique_ptr<UIContext> mUIContext;
   std::unique_ptr<OpenGLContext> mOpenGLContext;
-  std::unique_ptr<SceneView> mSceneView;
+  std::shared_ptr<SceneView> mSceneView;
   WindowPrivate() : mIsRunning(false), mWindow(nullptr) {}
 };
 
@@ -47,7 +47,7 @@ bool OpenGLWindow::init(int width, int height, const std::string &title) {
     }
   mPrivate->mUIContext->init(this);
   mPrivate->mSceneView =
-      std::make_unique<SceneView>(mPrivate->mUIContext->GetContext());
+      std::make_shared<SceneView>(mPrivate->mUIContext->GetContext());
   
   
   return mPrivate->mIsRunning;
@@ -108,4 +108,9 @@ void OpenGLWindow::setWindowIcon(const std::string& iconPath) {
   
   glfwSetWindowIcon(mPrivate->mWindow, 1, &icon);
   stbi_image_free(icon.pixels);
+}
+
+std::shared_ptr<SceneView> OpenGLWindow::sceneView()
+{
+  return mPrivate->mSceneView;
 }

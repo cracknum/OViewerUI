@@ -3,6 +3,7 @@
 #include "WidgetsExport.h"
 #include <memory>
 #include <string>
+#include "IWindow.hpp"
 
 struct ApplicationPrivate;
 
@@ -17,6 +18,7 @@ public:
     bool exec();
 
     static std::string getExecutableDir();
+    std::shared_ptr<IWindow> renderWindow();
 
 private:
     std::unique_ptr<ApplicationPrivate> mPrivate;

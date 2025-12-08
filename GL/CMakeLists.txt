@@ -8,6 +8,9 @@ set(source_files
         src/OpenGLContext.cpp
         src/RenderContext.cpp
         src/UIContext.cpp
+        src/Renderer.cpp
+        src/Mapper.cpp
+        src/Actor.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${source_files})
