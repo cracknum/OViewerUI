@@ -9,6 +9,12 @@ set(source_files
         src/MenuBar.cpp
         src/Application.cpp
         src/OpenGLWindow.cpp
+        src/DataManagerWidget.cpp
+        src/ImageNavigatorWidget.cpp
+        src/ImagePropertiesWidget.cpp
+        src/LogWidget.cpp
+        src/PixelValueWidget.cpp
+        src/OpenGLViewerWidget.cpp
 )
 
 set(header_files
@@ -16,6 +22,13 @@ set(header_files
         include/MenuBar.h
         include/Application.hpp
         include/OpenGLWindow.hpp
+        include/AbstractPropertiesWidget.h
+        include/DataManagerWidget.h
+        include/ImageNavigatorWidget.h
+        include/ImagePropertiesWidget.h
+        include/LogWidget.h
+        include/PixelValueWidget.h
+        include/OpenGLViewerWidget.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${source_files} ${header_files})

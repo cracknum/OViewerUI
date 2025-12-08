@@ -3,6 +3,7 @@
 #include "SceneView.hpp"
 #include "UIContext.hpp"
 // clang-format off
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 // clang-format on
 #include <iostream>
@@ -16,7 +17,7 @@ struct WindowPrivate final {
   GLFWwindow *mWindow;
   std::unique_ptr<UIContext> mUIContext;
   std::unique_ptr<OpenGLContext> mOpenGLContext;
-  std::unique_ptr<SceneView> mPropertyPanel;
+  std::unique_ptr<SceneView> mSceneView;
   WindowPrivate() : mIsRunning(false), mWindow(nullptr) {}
 };
 
@@ -39,17 +40,23 @@ bool OpenGLWindow::init(int width, int height, const std::string &title) {
   mTitle = title;
 
   mPrivate->mOpenGLContext->init(this);
-  mPrivate->mUIContext->init(this);
-  mPrivate->mPropertyPanel =
-      std::make_unique<SceneView>(mPrivate->mUIContext->GetContext());
 
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        fprintf(stderr, "Failed to initialize GLAD in Widgets DLL\n");
+        return false;
+    }
+  mPrivate->mUIContext->init(this);
+  mPrivate->mSceneView =
+      std::make_unique<SceneView>(mPrivate->mUIContext->GetContext());
+  
+  
   return mPrivate->mIsRunning;
 }
 
 void OpenGLWindow::render() {
   mPrivate->mOpenGLContext->preRender();
   mPrivate->mUIContext->preRender();
-  mPrivate->mPropertyPanel->render();
+  mPrivate->mSceneView->render();
 
   mPrivate->mUIContext->postRender();
   mPrivate->mOpenGLContext->postRender();
@@ -100,4 +107,5 @@ void OpenGLWindow::setWindowIcon(const std::string& iconPath) {
   }
   
   glfwSetWindowIcon(mPrivate->mWindow, 1, &icon);
+  stbi_image_free(icon.pixels);
 }

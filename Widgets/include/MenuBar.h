@@ -51,7 +51,7 @@ public:
   };
 
 public:
-  MenuBar();
+  MenuBar(const char* widgetName = "", int widgetFlags = 0);
   ~MenuBar() override;
   bool Render() override;
 
