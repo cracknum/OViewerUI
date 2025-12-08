@@ -5,13 +5,12 @@
 #include "ImagePropertiesWidget.h"
 #include "LogWidget.h"
 #include "MenuBar.h"
+#include "OpenGLViewerWidget.h"
 #include "PixelValueWidget.h"
 #include "imgui_internal.h"
 #include <imfilebrowser.h>
 #include <imgui.h>
 #include <spdlog/spdlog.h>
-#include "OpenGLViewerWidget.h"
-
 
 class MenuItemClickedObserver final : public IEventObserver
 {
@@ -69,7 +68,8 @@ struct SceneView::Impl final
     mImageNavigatorWidget = std::make_unique<ImageNavigatorWidget>(UI_IMAGE_NAVIGATOR_WINDOW);
     mImagePropertiesWidget = std::make_unique<ImagePropertiesWidget>(UI_PROPERTIES_WINDOW);
     mLogWidget = std::make_unique<LogWidget>(UI_LOG_BOX);
-    mViewerWidget = std::make_shared<OpenGLViewerWidget>(UI_VIEW_BOX, ImGuiWindowFlags_NoBackground);
+    mViewerWidget = std::make_shared<OpenGLViewerWidget>(
+      UI_VIEW_BOX, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove);
   }
 };
 
@@ -102,8 +102,8 @@ void SceneView::render(SceneView* mScene) const
   ImGui::SetNextWindowViewport(viewport->ID);
 
   constexpr int windowFlags =
-    ImGuiWindowFlags_NoDecoration // 无标题栏、不可改变大小、无滚动条、不可折叠
-    | ImGuiWindowFlags_NoMove     // 不可移动
+    ImGuiWindowFlags_NoDecoration            // 无标题栏、不可改变大小、无滚动条、不可折叠
+    | ImGuiWindowFlags_NoMove                // 不可移动
     | ImGuiWindowFlags_NoBackground          // 无背景（背景透明）
     | ImGuiWindowFlags_MenuBar               // 菜单栏
     | ImGuiWindowFlags_NoDocking             // 不可停靠

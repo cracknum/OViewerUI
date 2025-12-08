@@ -1,8 +1,9 @@
 #ifndef ACTOR_GL_H
 #define ACTOR_GL_H
-#include <memory>
 #include "GLExport.h"
-class Mapper;
+#include "Mapper.h"
+#include <memory>
+
 class GL_API Actor
 {
 public:
@@ -10,6 +11,7 @@ public:
   virtual ~Actor();
   void setMapper(const std::shared_ptr<Mapper>& mapper);
   virtual void render() = 0;
+  std::shared_ptr<Mapper> mapper();
 
 private:
   struct Private;
