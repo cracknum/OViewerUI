@@ -1,9 +1,16 @@
 #include "OpenGLViewerWidget.h"
 #include <imgui.h>
+#include <spdlog/spdlog.h>
+#include "FrameBuffer.h"
 
 struct OpenGLViewerWidget::Private
 {
-  std::vector<std::shared_ptr<Renderer>> mRenderers;
+  std::shared_ptr<FrameBuffer> mFrameBuffer;
+
+  Private()
+  {
+    mFrameBuffer = std::make_shared<FrameBuffer>(1, 1);
+  }
 };
 OpenGLViewerWidget::OpenGLViewerWidget(const char* widgetNamae, int widgetFlags)
   : Widget(widgetNamae, widgetFlags)
@@ -21,28 +28,8 @@ bool OpenGLViewerWidget::Render()
 
   if (ImGui::Begin(mWidgetName.c_str(), nullptr, mWidgetFlags))
   {
-
   }
   ImGui::End();
   ImGui::PopStyleVar(3); // 弹出样式设置
   return false;
-}
-
-void OpenGLViewerWidget::addRenderer(const std::shared_ptr<Renderer>& renderer)
-{
-  mPrivate->mRenderers.push_back(renderer);
-}
-
-void OpenGLViewerWidget::removeRenderer(const Renderer* renderer)
-{
-  auto it = std::find_if(mPrivate->mRenderers.begin(), mPrivate->mRenderers.end(),
-    [renderer](const std::shared_ptr<Renderer>& readyRenderer)
-    { return renderer == readyRenderer.get(); });
-  
-  if (it == mPrivate->mRenderers.end())
-  {
-    return;
-  }
-
-  mPrivate->mRenderers.erase(it);
 }

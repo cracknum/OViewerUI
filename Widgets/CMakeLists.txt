@@ -41,6 +41,7 @@ target_link_libraries(
         Core
         GL
         spdlog::spdlog
+        OpenGLCore::Object
 )
 target_compile_definitions(${PROJECT_NAME} PRIVATE WIDGETS_EXPORTS)
 add_library(${frame_work_name}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
