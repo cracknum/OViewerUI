@@ -1,6 +1,4 @@
 #include "OpenGLViewerWidget.h"
-#include "Renderer.h"
-#include <glad/glad.h>
 #include <imgui.h>
 
 struct OpenGLViewerWidget::Private
@@ -13,7 +11,7 @@ OpenGLViewerWidget::OpenGLViewerWidget(const char* widgetNamae, int widgetFlags)
   mPrivate = std::make_unique<Private>();
 }
 
-OpenGLViewerWidget::~OpenGLViewerWidget() {}
+OpenGLViewerWidget::~OpenGLViewerWidget() = default;
 
 bool OpenGLViewerWidget::Render()
 {
@@ -23,10 +21,7 @@ bool OpenGLViewerWidget::Render()
 
   if (ImGui::Begin(mWidgetName.c_str(), nullptr, mWidgetFlags))
   {
-    for (auto it : mPrivate->mRenderers)
-    {
-      it->render();
-    }
+
   }
   ImGui::End();
   ImGui::PopStyleVar(3); // 弹出样式设置

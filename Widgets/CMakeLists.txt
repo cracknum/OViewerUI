@@ -38,7 +38,6 @@ target_link_libraries(
         glm::glm
         imgui::imgui
         ImGuiHelper
-        glad::glad
         Core
         GL
         spdlog::spdlog

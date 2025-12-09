@@ -1,7 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 #include "WidgetsExport.h"
-#include "IWindow.hpp"
+#include <IWindow.hpp>
 #include <memory>
 #include <string>
 #include "SceneView.hpp"
@@ -22,7 +22,7 @@ public:
     void setNativeWindow(void *window) override;
     void onResize(int width, int height) override;
     void close() override;
-    void setWindowIcon(const std::string& iconPath);
+    void setWindowIcon(const std::string& iconPath) override;
     std::shared_ptr<SceneView> sceneView();
 
 private:

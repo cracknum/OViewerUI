@@ -12,6 +12,7 @@ find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
+
 add_subdirectory(third_party)
 configure_file(cmake/config.h.in config.h @ONLY)
 set(CONFIG_FILE_PATH ${CMAKE_CURRENT_BINARY_DIR})
@@ -32,5 +33,6 @@ add_subdirectory(Core)
 add_subdirectory(Widgets)
 add_subdirectory(GL)
 add_subdirectory(Test)
+add_subdirectory(third_party/OpenGLCore)
 
 

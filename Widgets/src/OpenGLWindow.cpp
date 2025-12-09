@@ -2,26 +2,28 @@
 #include "OpenGLContext.hpp"
 #include "SceneView.hpp"
 #include "UIContext.hpp"
-// clang-format off
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-// clang-format on
 #include <iostream>
-#include "OpenGLWindow.hpp"
 #include <spdlog/spdlog.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <GLFW/glfw3.h>
 
-struct WindowPrivate final {
+struct WindowPrivate final
+{
   bool mIsRunning;
-  GLFWwindow *mWindow;
+  void* mWindow;
   std::unique_ptr<UIContext> mUIContext;
   std::unique_ptr<OpenGLContext> mOpenGLContext;
   std::shared_ptr<SceneView> mSceneView;
-  WindowPrivate() : mIsRunning(false), mWindow(nullptr) {}
+  WindowPrivate()
+    : mIsRunning(false)
+    , mWindow(nullptr)
+  {
+  }
 };
 
-OpenGLWindow::OpenGLWindow() {
+OpenGLWindow::OpenGLWindow()
+{
   mPrivate = std::make_unique<WindowPrivate>();
   mPrivate->mIsRunning = true;
   mPrivate->mWindow = nullptr;
@@ -29,31 +31,27 @@ OpenGLWindow::OpenGLWindow() {
   mPrivate->mOpenGLContext = std::make_unique<OpenGLContext>();
 }
 
-OpenGLWindow::~OpenGLWindow() {
+OpenGLWindow::~OpenGLWindow()
+{
   mPrivate->mUIContext->end();
   mPrivate->mOpenGLContext->end();
 }
 
-bool OpenGLWindow::init(int width, int height, const std::string &title) {
+bool OpenGLWindow::init(int width, int height, const std::string& title)
+{
   mWidth = width;
   mHeight = height;
   mTitle = title;
 
   mPrivate->mOpenGLContext->init(this);
-
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        fprintf(stderr, "Failed to initialize GLAD in Widgets DLL\n");
-        return false;
-    }
   mPrivate->mUIContext->init(this);
-  mPrivate->mSceneView =
-      std::make_shared<SceneView>(mPrivate->mUIContext->GetContext());
-  
-  
+  mPrivate->mSceneView = std::make_shared<SceneView>(mPrivate->mUIContext->GetContext());
+
   return mPrivate->mIsRunning;
 }
 
-void OpenGLWindow::render() {
+void OpenGLWindow::render()
+{
   mPrivate->mOpenGLContext->preRender();
   mPrivate->mUIContext->preRender();
   mPrivate->mSceneView->render();
@@ -64,35 +62,48 @@ void OpenGLWindow::render() {
   handleInput();
 }
 
-void OpenGLWindow::handleInput() {
+void OpenGLWindow::handleInput()
+{
   double x, y;
-  glfwGetCursorPos(mPrivate->mWindow, &x, &y);
+  glfwGetCursorPos(static_cast<GLFWwindow*>(mPrivate->mWindow), &x, &y);
 }
 
-bool OpenGLWindow::isRunning() const { return mPrivate->mIsRunning; }
-
-void *OpenGLWindow::getNativeWindow() { return mPrivate->mWindow; }
-
-void OpenGLWindow::setNativeWindow(void *window) {
-  mPrivate->mWindow = static_cast<GLFWwindow *>(window);
+bool OpenGLWindow::isRunning() const
+{
+  return mPrivate->mIsRunning;
 }
 
-void OpenGLWindow::onResize(int width, int height) {
+void* OpenGLWindow::getNativeWindow()
+{
+  return mPrivate->mWindow;
+}
+
+void OpenGLWindow::setNativeWindow(void* window)
+{
+  mPrivate->mWindow = window;
+}
+
+void OpenGLWindow::onResize(int width, int height)
+{
   mWidth = width;
   mHeight = height;
 
   render();
 }
 
-void OpenGLWindow::close() { mPrivate->mIsRunning = false; }
+void OpenGLWindow::close()
+{
+  mPrivate->mIsRunning = false;
+}
 
-void OpenGLWindow::setWindowIcon(const std::string& iconPath) {
+void OpenGLWindow::setWindowIcon(const std::string& iconPath)
+{
   if (!mPrivate->mWindow)
   {
     SPDLOG_ERROR("window is not initialized");
     return;
   }
-  
+
   int width = 0;
   int height = 0;
   int channels = 0;
@@ -105,8 +116,8 @@ void OpenGLWindow::setWindowIcon(const std::string& iconPath) {
     SPDLOG_ERROR("could not open file: {}, failed reason: {}", iconPath, stbi_failure_reason());
     return;
   }
-  
-  glfwSetWindowIcon(mPrivate->mWindow, 1, &icon);
+
+  glfwSetWindowIcon(static_cast<GLFWwindow*>(mPrivate->mWindow), 1, &icon);
   stbi_image_free(icon.pixels);
 }
 
