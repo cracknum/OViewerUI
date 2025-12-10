@@ -5,8 +5,10 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "MouseEvent.h"
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <stb_image.h>
 
 struct WindowPrivate final
 {
@@ -23,6 +25,7 @@ struct WindowPrivate final
 };
 
 OpenGLWindow::OpenGLWindow()
+  : Widget("")
 {
   mPrivate = std::make_unique<WindowPrivate>();
   mPrivate->mIsRunning = true;
@@ -50,7 +53,7 @@ bool OpenGLWindow::init(int width, int height, const std::string& title)
   return mPrivate->mIsRunning;
 }
 
-void OpenGLWindow::render()
+bool OpenGLWindow::Render()
 {
   mPrivate->mOpenGLContext->preRender();
   mPrivate->mUIContext->preRender();
@@ -60,12 +63,17 @@ void OpenGLWindow::render()
   mPrivate->mOpenGLContext->postRender();
 
   handleInput();
+
+  return true;
 }
 
 void OpenGLWindow::handleInput()
 {
-  double x, y;
-  glfwGetCursorPos(static_cast<GLFWwindow*>(mPrivate->mWindow), &x, &y);
+  mousePressCheck();
+
+  mouseDragCheck();
+  mouseMoveCheck();
+  mouseReleaseCheck();
 }
 
 bool OpenGLWindow::isRunning() const
@@ -88,7 +96,7 @@ void OpenGLWindow::onResize(int width, int height)
   mWidth = width;
   mHeight = height;
 
-  render();
+  Render();
 }
 
 void OpenGLWindow::close()
@@ -124,4 +132,54 @@ void OpenGLWindow::setWindowIcon(const std::string& iconPath)
 std::shared_ptr<SceneView> OpenGLWindow::sceneView()
 {
   return mPrivate->mSceneView;
+}
+
+void OpenGLWindow::mousePressCheck()
+{
+  if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+  {
+    auto& io = ImGui::GetIO();
+
+    auto buttonPos = io.MouseClickedPos[ImGuiMouseButton_Left];
+    auto eventData = std::make_unique<MousePressedData>(buttonPos, ImGuiMouseButton_Left);
+    this->invokeEvent(MouseEvent(EventId::MousePressed, std::move(eventData)));
+
+    SPDLOG_DEBUG("mouse left button clicked");
+  }
+}
+
+void OpenGLWindow::mouseMoveCheck()
+{
+  auto& io = ImGui::GetIO();
+  if (!ImGui::IsAnyMouseDown() && (fabsf(io.MouseDelta.x) > 1e-6 || fabsf(io.MouseDelta.y) > 1e-6))
+  {
+    ImVec2 mousePos = io.MousePos;
+    ImVec2 preMousePos = io.MousePosPrev;
+
+    auto eventData = std::make_unique<MouseMoveData>(mousePos, preMousePos);
+    this->invokeEvent(MouseEvent(EventId::MouseMove, std::move(eventData)));
+    SPDLOG_DEBUG("mouse move");
+  }
+}
+
+void OpenGLWindow::mouseDragCheck()
+{
+  if (ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+  {
+    auto& io = ImGui::GetIO();
+    ImVec2 accumulateDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
+    auto eventData = std::make_unique<MouseDragData>(accumulateDelta, ImGuiMouseButton_Left);
+    this->invokeEvent(MouseEvent(EventId::MouseDrag, std::move(eventData)));
+
+    SPDLOG_DEBUG("mouse draging");
+  }
+}
+
+void OpenGLWindow::mouseReleaseCheck()
+{
+  if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+  {
+    this->invokeEvent(MouseEvent(EventId::MouseRelease, std::make_unique<MouseReleaseData>()));
+    SPDLOG_DEBUG("mouse left button released");
+  }
 }

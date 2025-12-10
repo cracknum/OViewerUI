@@ -5,17 +5,18 @@
 #include <memory>
 #include <string>
 #include "SceneView.hpp"
+#include "UIObject.h"
 
 struct WindowPrivate;
 
-class WIDGETS_API OpenGLWindow final: public IWindow
+class WIDGETS_API OpenGLWindow final: public IWindow, public Widget
 {
 public:
     OpenGLWindow();
     ~OpenGLWindow() override;
 
     bool init(int width, int height, const std::string& title);
-    void render();
+    bool Render() override;
     void handleInput();
     [[nodiscard]] bool isRunning() const;
     void *getNativeWindow() override;
@@ -24,6 +25,11 @@ public:
     void close() override;
     void setWindowIcon(const std::string& iconPath) override;
     std::shared_ptr<SceneView> sceneView();
+
+    void mousePressCheck();
+    void mouseMoveCheck();
+    void mouseDragCheck();
+    void mouseReleaseCheck();
 
 private:
     std::unique_ptr<WindowPrivate> mPrivate;

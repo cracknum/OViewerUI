@@ -84,7 +84,7 @@ bool Application::exec()
 {
   while (mPrivate->mRenderWindow->isRunning())
   {
-    mPrivate->mRenderWindow->render();
+    mPrivate->mRenderWindow->Render();
   }
 
   return true;
