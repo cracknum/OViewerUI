@@ -4,25 +4,15 @@
 #include "ImageNavigatorWidget.h"
 #include "ImagePropertiesWidget.h"
 #include "LogWidget.h"
-#include "MenuBar.h"
 #include "OpenGLViewerWidget.h"
 #include "PixelValueWidget.h"
 #include "imgui_internal.h"
 #include <imfilebrowser.h>
 #include <imgui.h>
 #include <spdlog/spdlog.h>
+#include "WidgetEvent.h"
+#include "WidgetEventData.h"
 
-class MenuItemClickedObserver final : public IEventObserver
-{
-public:
-  bool handle(const EventObject& event) override
-  {
-    auto data = dynamic_cast<const MenuItemData*>(event.eventData());
-    SPDLOG_DEBUG("item clicked, event type: {}, address: {}",
-      EventIdStr[static_cast<int>(event.eventId())], data->menuItemName());
-    return true;
-  }
-};
 
 struct SceneView::Impl final
 {
@@ -30,7 +20,6 @@ struct SceneView::Impl final
   ImGui::FileBrowser mFileDialog;
   std::string mCurrentFile;
   ImGuiContext* mContext{};
-  std::unique_ptr<MenuBar> mMenuBar;
 
   ImGuiID mDataManagerNode;
   ImGuiID mPixelValueNode;
@@ -62,7 +51,6 @@ struct SceneView::Impl final
     , mLogNode(0)
     , mViewNode(0)
   {
-    mMenuBar = std::make_unique<MenuBar>();
     mDataManagerWidget = std::make_unique<DataManagerWidget>(UI_DATA_MANAGER);
     mPixelValueWidget = std::make_unique<PixelValueWidget>(UI_PIXEL_VALUE_WINDOW);
     mImageNavigatorWidget = std::make_unique<ImageNavigatorWidget>(UI_IMAGE_NAVIGATOR_WINDOW);
@@ -77,16 +65,6 @@ SceneView::SceneView(ImGuiContext* context)
 {
   mImpl = std::make_unique<Impl>();
   mImpl->mContext = context;
-
-  MenuBar::Menu menu;
-  menu.setName("File");
-  MenuBar::Menu::Item item1("open", std::make_shared<MenuItemClickedObserver>());
-  MenuBar::Menu::Item item2("close", std::make_shared<MenuItemClickedObserver>());
-
-  menu.addItem(item1);
-  menu.addItem(item2);
-
-  mImpl->mMenuBar->addMenu(menu);
 }
 
 SceneView::~SceneView() = default;
@@ -119,7 +97,6 @@ void SceneView::render(SceneView* mScene) const
   ImGui::Begin(mImpl->UI_DOCK_WINDOW, nullptr, windowFlags); // 开始停靠窗口
   ImGui::PopStyleVar(3);                                     // 弹出样式设置
 
-  mImpl->mMenuBar->Render();
   // 创建停靠空间
   if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable)
   { // 判断是否开启停靠
@@ -196,4 +173,18 @@ SceneView& SceneView::operator=(SceneView&&) noexcept = default;
 std::shared_ptr<OpenGLViewerWidget> SceneView::viewerWidget()
 {
   return mImpl->mViewerWidget;
+}
+
+bool SceneView::handle(const EventObject& event)
+{
+  auto widgetEvent = dynamic_cast<const WidgetEvent*>(&event);
+  if (widgetEvent)
+  {
+    auto resizeData = dynamic_cast<const WidgetResizeData*>(widgetEvent->eventData());
+    if (resizeData)
+    {
+      SPDLOG_DEBUG(" receive resize event, new size: {} {}", resizeData->widgetSize().x, resizeData->widgetSize().y);
+    }
+  }
+  return false;
 }

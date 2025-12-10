@@ -5,7 +5,6 @@
 #include <utility>
 #include <vector>
 
-
 struct MenuBar::Impl final
 {
   std::vector<Menu> mMenus;
@@ -54,10 +53,10 @@ bool MenuBar::Render()
       {
         for (auto& item : menu.mMenuItems)
         {
-          if (ImGui::MenuItem(item.mName.c_str()))
+          if (ImGui::MenuItem(item.mName.c_str()) && item.mName == "exit")
           {
             item.invokeEvent(MenuItemClicked(
-              EventId::MenuItemClicked, std::make_unique<MenuItemData>(item.mName)));
+              EventId::Exit, std::make_unique<MenuItemData>(item.mName)));
           }
         }
         ImGui::EndMenu();

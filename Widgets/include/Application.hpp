@@ -14,7 +14,6 @@ public:
     ~Application();
 
     void setWindowIcon(const std::string& iconPath);
-
     bool exec();
 
     static std::string getExecutableDir();

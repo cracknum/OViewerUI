@@ -22,9 +22,13 @@ public:
     void *getNativeWindow() override;
     void setNativeWindow(void *window) override;
     void onResize(int width, int height) override;
+    void resize(int width, int height) override;
+    void fullScreen() override;
+    void maximum() override;
     void close() override;
     void setWindowIcon(const std::string& iconPath) override;
     std::shared_ptr<SceneView> sceneView();
+    void exit() override;
 
     void mousePressCheck();
     void mouseMoveCheck();

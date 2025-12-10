@@ -8,6 +8,7 @@ int main(int argc, char** argv)
   Application app(argc, argv);
   Log::initLog(spdlog::level::debug);
   auto renderWindow = app.renderWindow();
+  renderWindow->maximum();
   auto glRenderWindow = std::static_pointer_cast<OpenGLWindow>(renderWindow);
   if (!glRenderWindow)
   {

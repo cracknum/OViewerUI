@@ -15,10 +15,24 @@ enum class EventId
   WheelForward,
   WheelBackward,
   //-------------- mouse event------------------
+  //-------------- widget event-----------------
+  WidgetResize,
+  //-------------- widget event-----------------
+  //-------------- app event--------------------
+  Exit,
+  //-------------- app event--------------------
   CustomEvent
 };
 
-inline std::vector<std::string> EventIdStr = { "FileOpened", "FileClosed", "MenuItemClicked",
-  "RenderUpdate", "MousePressed", "MouseMove", "MouseRelease", "MouseDrag", "MouseForward", "MouseBackward"};
+// clang-format off
+inline std::vector<std::string> EventIdStr = { 
+  "FileOpened", "FileClosed", "MenuItemClicked",
+  "RenderUpdate", 
+  "MousePressed", "MouseMove", "MouseRelease", "MouseDrag", "MouseForward", "MouseBackward",
+  "WidgetResize",
+  "Exit"
+};
+
+// clang-format on
 
 #endif // EVENT_ID_H

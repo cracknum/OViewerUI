@@ -13,6 +13,7 @@ public:
     static ImGuiContext *UIContext::GetContext();
     void preRender() override;
     void postRender() override;
+    void resize(int width, int height) override;
     void end() override;
 };
 #endif // UI_CONTEXT_H

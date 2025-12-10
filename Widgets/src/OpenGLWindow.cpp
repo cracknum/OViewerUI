@@ -5,10 +5,50 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 #define STB_IMAGE_IMPLEMENTATION
+#include "AppEvent.h"
+#include "AppEventData.h"
+#include "MenuBar.h"
 #include "MouseEvent.h"
+#include "WidgetEvent.h"
+#include "WidgetEventData.h"
 #include <GLFW/glfw3.h>
+#include <functional>
 #include <imgui.h>
 #include <stb_image.h>
+
+class MenuItemClickedObserver final : public IEventObserver
+{
+public:
+  bool handle(const EventObject& event) override
+  {
+    auto data = dynamic_cast<const MenuItemData*>(event.eventData());
+    SPDLOG_DEBUG("item clicked, event type: {}, address: {}",
+      EventIdStr[static_cast<int>(event.eventId())], data->menuItemName());
+    return true;
+  }
+};
+
+class ExitObserver : public IEventObserver
+{
+public:
+  bool handle(const EventObject& event) override
+  {
+    auto menuEvent = dynamic_cast<const MenuItemClicked*>(&event);
+    if (menuEvent && menuEvent->eventId() == EventId::Exit && mCallback)
+    {
+      mCallback();
+      SPDLOG_DEBUG("APP exit");
+    }
+      SPDLOG_DEBUG("APP exit: {}", EventIdStr[static_cast<int>(event.eventId())]);
+
+    return true;
+  }
+
+  void setExitCallBack(std::function<void()> callback) { mCallback = std::move(callback); }
+
+private:
+  std::function<void()> mCallback;
+};
 
 struct WindowPrivate final
 {
@@ -17,10 +57,13 @@ struct WindowPrivate final
   std::unique_ptr<UIContext> mUIContext;
   std::unique_ptr<OpenGLContext> mOpenGLContext;
   std::shared_ptr<SceneView> mSceneView;
+  std::unique_ptr<MenuBar> mMenuBar;
+
   WindowPrivate()
     : mIsRunning(false)
     , mWindow(nullptr)
   {
+    mMenuBar = std::make_unique<MenuBar>();
   }
 };
 
@@ -49,14 +92,36 @@ bool OpenGLWindow::init(int width, int height, const std::string& title)
   mPrivate->mOpenGLContext->init(this);
   mPrivate->mUIContext->init(this);
   mPrivate->mSceneView = std::make_shared<SceneView>(mPrivate->mUIContext->GetContext());
+  this->addObserver(mPrivate->mSceneView);
+
+  MenuBar::Menu menu;
+  menu.setName("File");
+  MenuBar::Menu::Item item1("open", std::make_shared<MenuItemClickedObserver>());
+  MenuBar::Menu::Item item2("close", std::make_shared<MenuItemClickedObserver>());
+  menu.addItem(item1);
+  menu.addItem(item2);
+
+  MenuBar::Menu exitMenu;
+  exitMenu.setName("App");
+
+  auto exitObserver = std::make_shared<ExitObserver>();
+  exitObserver->setExitCallBack([this]() { exit(); });
+  MenuBar::Menu::Item exitItem("exit", exitObserver);
+
+  exitMenu.addItem(exitItem);
+
+  mPrivate->mMenuBar->addMenu(menu);
+  mPrivate->mMenuBar->addMenu(exitMenu);
 
   return mPrivate->mIsRunning;
 }
 
 bool OpenGLWindow::Render()
 {
+  ImGui::SetCurrentContext(mPrivate->mUIContext->GetContext());
   mPrivate->mOpenGLContext->preRender();
   mPrivate->mUIContext->preRender();
+  mPrivate->mMenuBar->Render();
   mPrivate->mSceneView->render();
 
   mPrivate->mUIContext->postRender();
@@ -95,7 +160,8 @@ void OpenGLWindow::onResize(int width, int height)
 {
   mWidth = width;
   mHeight = height;
-
+  auto eventData = std::make_unique<WidgetResizeData>(ImVec2(width, height));
+  this->invokeEvent(WidgetEvent(EventId::WidgetResize, std::move(eventData)));
   Render();
 }
 
@@ -129,9 +195,32 @@ void OpenGLWindow::setWindowIcon(const std::string& iconPath)
   stbi_image_free(icon.pixels);
 }
 
+void OpenGLWindow::resize(int width, int height)
+{
+  mWidth = width;
+  mHeight = height;
+  mPrivate->mOpenGLContext->resize(width, height);
+}
+
+void OpenGLWindow::fullScreen()
+{
+  mPrivate->mOpenGLContext->fullScreen();
+}
+
+void OpenGLWindow::maximum()
+{
+  mPrivate->mOpenGLContext->maximum();
+}
+
 std::shared_ptr<SceneView> OpenGLWindow::sceneView()
 {
   return mPrivate->mSceneView;
+}
+
+void OpenGLWindow::exit()
+{
+  mPrivate->mIsRunning = false;
+  SPDLOG_DEBUG("RUNNING STATE: {}", mPrivate->mIsRunning);
 }
 
 void OpenGLWindow::mousePressCheck()

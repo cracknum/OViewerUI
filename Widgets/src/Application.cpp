@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <string>
 
-
 #ifdef _WIN32
 #include <limits.h>
 #include <windows.h>
@@ -53,11 +52,10 @@ std::string getExecutablePath()
 #endif
   auto path = std::string(buffer);
   std::replace(path.begin(), path.end(), '\\', '/');
-  
+
   return path;
 }
 }
-
 
 struct ApplicationPrivate
 {

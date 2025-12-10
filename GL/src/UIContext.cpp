@@ -24,8 +24,6 @@ bool UIContext::init(IWindow* window)
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport /
                                                         // Platform Windows
 
-  io.Fonts->AddFontFromFileTTF(FONT_LOCATION, 20.0f);
-
   auto& colors = ImGui::GetStyle().Colors;
   colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.1f, 0.1f, 1.0f };
 
@@ -61,6 +59,11 @@ bool UIContext::init(IWindow* window)
   // Setup Platform/Renderer backends
   ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(mWindow->getNativeWindow()), true);
   ImGui_ImplOpenGL3_Init(glsl_version);
+
+  float xscale, yscale;
+  glfwGetWindowContentScale(static_cast<GLFWwindow*>(mWindow->getNativeWindow()), &xscale, &yscale);
+
+  io.Fonts->AddFontFromFileTTF(FONT_LOCATION, xscale * 20.0f);
   return true;
 }
 ImGuiContext* UIContext::GetContext()
@@ -113,6 +116,8 @@ void UIContext::postRender()
     glfwMakeContextCurrent(backup_current_context);
   }
 }
+
+void UIContext::resize(int width, int height) {}
 
 void UIContext::end()
 {
