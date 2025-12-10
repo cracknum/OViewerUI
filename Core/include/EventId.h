@@ -6,7 +6,8 @@ enum class EventId
   FileOpened,
   FileClosed,
   MenuItemClicked,
-  RenderUpdate,
+  RenderUpdateStart,
+  RenderUpdateEnd,
   //-------------- mouse event------------------
   MousePressed,
   MouseMove,
@@ -27,7 +28,7 @@ enum class EventId
 // clang-format off
 inline std::vector<std::string> EventIdStr = { 
   "FileOpened", "FileClosed", "MenuItemClicked",
-  "RenderUpdate", 
+  "RenderUpdateStart", "RenderUpdateEnd",
   "MousePressed", "MouseMove", "MouseRelease", "MouseDrag", "MouseForward", "MouseBackward",
   "WidgetResize",
   "Exit"

@@ -3,6 +3,7 @@
 #include "Widget.h"
 #include "WidgetsExport.h"
 #include <memory>
+#include "FrameBuffer.h"
 
 class WIDGETS_API OpenGLViewerWidget final : public Widget
 {
@@ -12,6 +13,7 @@ public:
 
   bool render() override;
   void resize(int width, int height) override;
+  std::shared_ptr<FrameBuffer> renderBuffer();
 
 private:
   struct Private;

@@ -5,8 +5,8 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include "AppEvent.h"
-#include "AppEventData.h"
+#include "RenderEvent.h"
+#include "RenderEventData.h"
 #include "MenuBar.h"
 #include "MouseEvent.h"
 #include "WidgetEvent.h"
@@ -104,9 +104,10 @@ bool OpenGLWindow::render()
   ImGui::SetCurrentContext(mPrivate->mUIContext->GetContext());
   mPrivate->mOpenGLContext->preRender();
   mPrivate->mUIContext->preRender();
+  this->invokeEvent(RenderEvent(EventId::RenderUpdateStart, std::make_unique<RenderUpdateData>()));
   mPrivate->mMenuBar->render();
   mPrivate->mSceneView->render();
-
+  this->invokeEvent(RenderEvent(EventId::RenderUpdateEnd, std::make_unique<RenderUpdateData>()));
   mPrivate->mUIContext->postRender();
   mPrivate->mOpenGLContext->postRender();
 

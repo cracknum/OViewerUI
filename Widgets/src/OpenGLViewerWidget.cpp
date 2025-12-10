@@ -1,8 +1,6 @@
 #include "OpenGLViewerWidget.h"
-#include "FrameBuffer.h"
 #include <imgui.h>
 #include <spdlog/spdlog.h>
-
 
 struct OpenGLViewerWidget::Private
 {
@@ -26,13 +24,51 @@ bool OpenGLViewerWidget::render()
 
   if (ImGui::Begin(mWidgetName.c_str(), nullptr, mWidgetFlags))
   {
+    unsigned int texture = mPrivate->mFrameBuffer->texture();
+    int width = mPrivate->mFrameBuffer->textureWidth();
+    int height = mPrivate->mFrameBuffer->textureHeight();
+
+    if (texture == 0 || width <= 0 || height <= 0)
+      return false; // 安全检查
+
+    ImVec2 canvasSize = ImGui::GetContentRegionAvail();
+    if (canvasSize.x <= 0 || canvasSize.y <= 0)
+      return false;
+
+    // 计算保持宽高比的缩放因子
+    float scale = std::min(canvasSize.x / (float)width, canvasSize.y / (float)height);
+    ImVec2 imageSize = ImVec2(width * scale, height * scale);
+
+    // 获取当前光标位置
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+
+    // 计算居中偏移量
+    float offsetX = (canvasSize.x - imageSize.x) / 2;
+    float offsetY = (canvasSize.y - imageSize.y) / 2;
+
+    // 设置新的光标位置以居中图像
+    ImGui::SetCursorScreenPos(ImVec2(pos.x + offsetX, pos.y + offsetY));
+
+    // 如果图像上下颠倒，使用 uv0=(0,1), uv1=(1,0)
+    ImGui::Image(
+      (ImTextureID)(intptr_t)texture, imageSize, ImVec2(0, 1), // uv0 —— 左上角对应纹理底部
+      ImVec2(1, 0) // uv1 —— 右下角对应纹理顶部
+    );
+
+    // 恢复原始光标位置（如果需要）
+    ImGui::SetCursorScreenPos(pos);
   }
   ImGui::End();
   ImGui::PopStyleVar(3); // 弹出样式设置
-  return false;
+  return true;
 }
 
 void OpenGLViewerWidget::resize(int width, int height)
 {
   mPrivate->mFrameBuffer->updateBufferSize(width, height);
+}
+
+std::shared_ptr<FrameBuffer> OpenGLViewerWidget::renderBuffer()
+{
+  return mPrivate->mFrameBuffer;
 }
