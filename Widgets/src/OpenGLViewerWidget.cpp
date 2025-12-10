@@ -49,11 +49,8 @@ bool OpenGLViewerWidget::render()
     // 设置新的光标位置以居中图像
     ImGui::SetCursorScreenPos(ImVec2(pos.x + offsetX, pos.y + offsetY));
 
-    // 如果图像上下颠倒，使用 uv0=(0,1), uv1=(1,0)
-    ImGui::Image(
-      (ImTextureID)(intptr_t)texture, imageSize, ImVec2(0, 1), // uv0 —— 左上角对应纹理底部
-      ImVec2(1, 0) // uv1 —— 右下角对应纹理顶部
-    );
+    ImTextureID textureId(texture);
+    ImGui::Image(textureId, imageSize, ImVec2(0, 1), ImVec2(1, 0));
 
     // 恢复原始光标位置（如果需要）
     ImGui::SetCursorScreenPos(pos);

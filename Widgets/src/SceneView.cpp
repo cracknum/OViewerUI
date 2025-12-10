@@ -177,14 +177,5 @@ std::shared_ptr<OpenGLViewerWidget> SceneView::viewerWidget()
 
 bool SceneView::handle(const EventObject& event)
 {
-  auto widgetEvent = dynamic_cast<const WidgetEvent*>(&event);
-  if (widgetEvent)
-  {
-    auto resizeData = dynamic_cast<const WidgetResizeData*>(widgetEvent->eventData());
-    if (resizeData)
-    {
-      mImpl->mViewerWidget->resize(resizeData->widgetSize().x, resizeData->widgetSize().y);
-    }
-  }
   return false;
 }

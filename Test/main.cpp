@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include "OpenGLViewerWidget.h"
 #include "RenderEvent.h"
+#include "ShaderUtils.h"
 
 class RenderObserver : public IEventObserver
 {
@@ -20,6 +21,8 @@ public:
     : mViewerWidget(viewerWidget)
   {
     mShaderProgramManager = std::make_shared<ShaderProgramManager>();
+    mVertexShaderSource = ShaderUtils::loadShaderSource(R"(F:\Workspace\Projects\imgui_cuda_demo\Test\test.vert)");
+    mFragmentShaderSource = ShaderUtils::loadShaderSource( R"(F:\Workspace\Projects\imgui_cuda_demo\Test\test.frag)");
   }
   bool handle(const EventObject& event) override
   {
@@ -31,12 +34,14 @@ public:
     SPDLOG_DEBUG("event: {}", EventIdStr[static_cast<int>(renderEvent->eventId())]);
     
     std::unordered_map<GLenum, std::string> shaderSources;
-    shaderSources[GL_VERTEX_SHADER] = R"(D:\Workspace\github\OViewerUI\Test\test.vert)";
-    shaderSources[GL_FRAGMENT_SHADER] = R"(D:\Workspace\github\OViewerUI\Test\test.frag)";
+    shaderSources[GL_VERTEX_SHADER] = mVertexShaderSource;
+    shaderSources[GL_FRAGMENT_SHADER] = mFragmentShaderSource;
     auto shaderProgram = mShaderProgramManager->getShaderProgram(shaderSources);
-    SPDLOG_DEBUG("step 1");
+    auto frameBuffer = mViewerWidget->renderBuffer();
+
     if (!mVetexIndexBuffer)
     {
+      mVetexIndexBuffer = std::make_shared<VertexIndexBuffer>();
       Vertices vertices;
       // clang-format off
     vertices.m_Data = new GLfloat[8]{
@@ -55,20 +60,14 @@ public:
       vertices.m_PointAttribute.first = true;
       vertices.m_PointAttribute.second = 2;
       mVetexIndexBuffer->createBuffer(vertices);
+
+      frameBuffer->updateBufferSize(512, 512);
     }
-SPDLOG_DEBUG("step 2");
-    auto frameBuffer = mViewerWidget->renderBuffer();
-SPDLOG_DEBUG("step 3");
     shaderProgram->use();
-    SPDLOG_DEBUG("step 4");
     frameBuffer->bind();
-    SPDLOG_DEBUG("step 5");
     mVetexIndexBuffer->draw(GL_TRIANGLES);
-    SPDLOG_DEBUG("step 6");
     frameBuffer->unbind();
-    SPDLOG_DEBUG("step 7");
     shaderProgram->unuse();
-    SPDLOG_DEBUG("step 8");
 
     SPDLOG_DEBUG("draw finished");
 
@@ -79,6 +78,8 @@ private:
   std::shared_ptr<OpenGLViewerWidget> mViewerWidget;
   std::shared_ptr<ShaderProgramManager> mShaderProgramManager;
   std::shared_ptr<VertexIndexBuffer> mVetexIndexBuffer;
+  std::string mVertexShaderSource;
+  std::string mFragmentShaderSource;
 };
 
 int main(int argc, char** argv)
