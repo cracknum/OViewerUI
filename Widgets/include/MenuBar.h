@@ -53,7 +53,8 @@ public:
 public:
   MenuBar(const char* widgetName = "", int widgetFlags = 0);
   ~MenuBar() override;
-  bool Render() override;
+  bool render() override;
+  void resize(int width, int height) override;
 
   void addMenu(const Menu& item);
 

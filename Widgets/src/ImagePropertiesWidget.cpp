@@ -13,7 +13,7 @@ ImagePropertiesWidget::ImagePropertiesWidget(const char* widgetName, int widgetF
 
 ImagePropertiesWidget::~ImagePropertiesWidget() {}
 
-bool ImagePropertiesWidget::Render()
+bool ImagePropertiesWidget::render()
 {
   if (ImGui::Begin(mWidgetName.c_str(), false, mWidgetFlags))
   {
@@ -22,3 +22,5 @@ bool ImagePropertiesWidget::Render()
   ImGui::End();
   return true;
 }
+
+void ImagePropertiesWidget::resize(int width, int height) {}

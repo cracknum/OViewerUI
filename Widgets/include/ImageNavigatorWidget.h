@@ -1,8 +1,9 @@
 #ifndef IMAGE_NAVIGATOR_WIDGET
 #define IMAGE_NAVIGATOR_WIDGET
 #include "Widget.h"
-#include <memory>
 #include "WidgetsExport.h"
+#include <memory>
+
 
 class WIDGETS_API ImageNavigatorWidget : public Widget
 {
@@ -10,7 +11,8 @@ public:
   ImageNavigatorWidget(const char* widgetName, int widgetFlags = 0);
   ~ImageNavigatorWidget();
 
-  bool Render() override;
+  bool render() override;
+  void resize(int width, int height) override;
 
 private:
   struct Private;

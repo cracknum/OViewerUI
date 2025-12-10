@@ -41,7 +41,7 @@ MenuBar::MenuBar(const char* widgetName /*= nullptr*/, int widgetFlags /*= 0*/)
   mImpl = std::make_unique<Impl>();
 }
 MenuBar::~MenuBar() = default;
-bool MenuBar::Render()
+bool MenuBar::render()
 {
   // BeginMainMenuBar()无论成功还是失败都需要调用EndMainMenuBar
   if (ImGui::BeginMainMenuBar())
@@ -67,6 +67,7 @@ bool MenuBar::Render()
 
   return true;
 }
+void MenuBar::resize(int width, int height) {}
 void MenuBar::addMenu(const Menu& item)
 {
   mImpl->mMenus.push_back(item);

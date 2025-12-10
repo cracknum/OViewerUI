@@ -11,7 +11,7 @@ ImageNavigatorWidget::ImageNavigatorWidget(const char* widgetName, int widgetFla
 
 ImageNavigatorWidget::~ImageNavigatorWidget() {}
 
-bool ImageNavigatorWidget::Render()
+bool ImageNavigatorWidget::render()
 {
     if (ImGui::Begin(mWidgetName.c_str(), false, mWidgetFlags))
     {
@@ -29,3 +29,5 @@ bool ImageNavigatorWidget::Render()
     
   return false;
 }
+
+void ImageNavigatorWidget::resize(int width, int height) {}

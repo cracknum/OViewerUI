@@ -10,7 +10,8 @@ public:
   explicit OpenGLViewerWidget(const char* widgetNamae, int widgetFlags = 0);
   ~OpenGLViewerWidget() override;
 
-  bool Render() override;
+  bool render() override;
+  void resize(int width, int height) override;
 
 private:
   struct Private;

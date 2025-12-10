@@ -16,7 +16,7 @@ public:
     ~OpenGLWindow() override;
 
     bool init(int width, int height, const std::string& title);
-    bool Render() override;
+    bool render() override;
     void handleInput();
     [[nodiscard]] bool isRunning() const;
     void *getNativeWindow() override;
@@ -29,6 +29,7 @@ public:
     void setWindowIcon(const std::string& iconPath) override;
     std::shared_ptr<SceneView> sceneView();
     void exit() override;
+    void initMenu();
 
     void mousePressCheck();
     void mouseMoveCheck();

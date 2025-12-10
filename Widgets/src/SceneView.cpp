@@ -159,12 +159,12 @@ void SceneView::render(SceneView* mScene) const
   }
   ImGui::End(); // 结束停靠窗口
 
-  mImpl->mDataManagerWidget->Render();
-  mImpl->mPixelValueWidget->Render();
-  mImpl->mImageNavigatorWidget->Render();
-  mImpl->mLogWidget->Render();
-  mImpl->mImagePropertiesWidget->Render();
-  mImpl->mViewerWidget->Render();
+  mImpl->mDataManagerWidget->render();
+  mImpl->mPixelValueWidget->render();
+  mImpl->mImageNavigatorWidget->render();
+  mImpl->mLogWidget->render();
+  mImpl->mImagePropertiesWidget->render();
+  mImpl->mViewerWidget->render();
 }
 
 SceneView::SceneView(SceneView&&) noexcept = default;
@@ -183,7 +183,7 @@ bool SceneView::handle(const EventObject& event)
     auto resizeData = dynamic_cast<const WidgetResizeData*>(widgetEvent->eventData());
     if (resizeData)
     {
-      SPDLOG_DEBUG(" receive resize event, new size: {} {}", resizeData->widgetSize().x, resizeData->widgetSize().y);
+      mImpl->mViewerWidget->resize(resizeData->widgetSize().x, resizeData->widgetSize().y);
     }
   }
   return false;

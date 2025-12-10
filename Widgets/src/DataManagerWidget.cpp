@@ -13,7 +13,7 @@ DataManagerWidget::DataManagerWidget(const char* widgetName, int widgetFlags /*=
 
 DataManagerWidget::~DataManagerWidget() {}
 
-bool DataManagerWidget::Render()
+bool DataManagerWidget::render()
 {
   if (ImGui::Begin(mWidgetName.c_str(), false, mWidgetFlags))
   {
@@ -31,3 +31,5 @@ bool DataManagerWidget::Render()
 
   return true;
 }
+
+void DataManagerWidget::resize(int width, int height) {}

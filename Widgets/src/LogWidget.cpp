@@ -13,7 +13,7 @@ LogWidget::LogWidget(const char* widgetName, int widgetFlag)
 
 LogWidget::~LogWidget() {}
 
-bool LogWidget::Render()
+bool LogWidget::render()
 {
     if (ImGui::Begin(mWidgetName.c_str(), false, mWidgetFlags))
     {
@@ -22,3 +22,5 @@ bool LogWidget::Render()
     ImGui::End();    
   return true;
 }
+
+void LogWidget::resize(int width, int height) {}

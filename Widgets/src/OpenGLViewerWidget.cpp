@@ -1,16 +1,14 @@
 #include "OpenGLViewerWidget.h"
+#include "FrameBuffer.h"
 #include <imgui.h>
 #include <spdlog/spdlog.h>
-#include "FrameBuffer.h"
+
 
 struct OpenGLViewerWidget::Private
 {
   std::shared_ptr<FrameBuffer> mFrameBuffer;
 
-  Private()
-  {
-    mFrameBuffer = std::make_shared<FrameBuffer>(1, 1);
-  }
+  Private() { mFrameBuffer = std::make_shared<FrameBuffer>(1, 1); }
 };
 OpenGLViewerWidget::OpenGLViewerWidget(const char* widgetNamae, int widgetFlags)
   : Widget(widgetNamae, widgetFlags)
@@ -20,7 +18,7 @@ OpenGLViewerWidget::OpenGLViewerWidget(const char* widgetNamae, int widgetFlags)
 
 OpenGLViewerWidget::~OpenGLViewerWidget() = default;
 
-bool OpenGLViewerWidget::Render()
+bool OpenGLViewerWidget::render()
 {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);            // 无边框
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f)); // 无边界
@@ -32,4 +30,9 @@ bool OpenGLViewerWidget::Render()
   ImGui::End();
   ImGui::PopStyleVar(3); // 弹出样式设置
   return false;
+}
+
+void OpenGLViewerWidget::resize(int width, int height)
+{
+  mPrivate->mFrameBuffer->updateBufferSize(width, height);
 }

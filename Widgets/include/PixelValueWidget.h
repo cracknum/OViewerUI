@@ -7,7 +7,8 @@ class PixelValueWidget final : public Widget
 public:
   PixelValueWidget(const char* widgetName, int widgetFlags = 0);
   ~PixelValueWidget();
-  bool Render() override;
+  bool render() override;
+  void resize(int width, int height) override;
 
 private:
   struct Private;

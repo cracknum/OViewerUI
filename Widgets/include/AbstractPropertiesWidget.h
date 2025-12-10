@@ -9,6 +9,7 @@ public:
     : Widget(widgetName, widgetFlags)
   {
   }
-  virtual bool Render() = 0;
+  virtual bool render() = 0;
+  virtual void resize(int width, int height) = 0;
 };
 #endif // ABSTRACT_PROPERTIES_WIDGET

@@ -13,7 +13,7 @@ PixelValueWidget::PixelValueWidget(const char* widgetName, int widgetFlags)
 
 PixelValueWidget::~PixelValueWidget() {}
 
-bool PixelValueWidget::Render()
+bool PixelValueWidget::render()
 {
   if (ImGui::Begin(mWidgetName.c_str(), false, mWidgetFlags))
   {
@@ -25,3 +25,5 @@ bool PixelValueWidget::Render()
 
   return false;
 }
+
+void PixelValueWidget::resize(int width, int height) {}
