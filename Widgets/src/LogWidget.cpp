@@ -1,5 +1,7 @@
 #include "LogWidget.h"
 #include <imgui.h>
+#include "WidgetEvent.h"
+#include "WidgetEventData.h"
 
 struct LogWidget::Private
 {
@@ -17,7 +19,8 @@ bool LogWidget::render()
 {
     if (ImGui::Begin(mWidgetName.c_str(), false, mWidgetFlags))
     {
-        /* code */
+        auto eventData = std::make_unique<DisplayLog>();
+        this->invokeEvent(WidgetEvent(EventId::DisplayLog, std::move(eventData)));
     }
     ImGui::End();    
   return true;

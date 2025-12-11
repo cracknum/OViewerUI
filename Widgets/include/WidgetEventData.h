@@ -2,6 +2,7 @@
 #define WIDGET_EVENT_DATA_H
 #include "EventData.h"
 #include <imgui.h>
+#include "EventMacro.h"
 class WidgetResizeData : public EventData
 {
 public:
@@ -15,5 +16,11 @@ public:
 private:
   ImVec2 mWidgetSize;
 };
+
+NoParamEventDataDeclaration(DisplayDataNodeTreeData, EventData);
+NoParamEventDataDeclaration(DisplayPixelValueData, EventData);
+NoParamEventDataDeclaration(DisplayImageNavigator, EventData);
+NoParamEventDataDeclaration(DisplayImageProperties, EventData);
+NoParamEventDataDeclaration(DisplayLog, EventData);
 
 #endif // WIDGET_EVENT_DATA_H

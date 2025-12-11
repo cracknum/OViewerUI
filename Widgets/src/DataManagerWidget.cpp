@@ -1,4 +1,6 @@
 #include "DataManagerWidget.h"
+#include "WidgetEvent.h"
+#include "WidgetEventData.h"
 #include <imgui.h>
 #include <string>
 
@@ -17,15 +19,8 @@ bool DataManagerWidget::render()
 {
   if (ImGui::Begin(mWidgetName.c_str(), false, mWidgetFlags))
   {
-    if (ImGui::TreeNode("data1"))
-    {
-        if (ImGui::TreeNode("data1.data1"))
-        {
-            ImGui::Text("data");
-            ImGui::TreePop();
-        }
-        ImGui::TreePop();
-    }
+    auto eventData = std::make_unique<DisplayDataNodeTreeData>();
+    this->invokeEvent(WidgetEvent(EventId::DisplayDataNodeTree, std::move(eventData)));
   }
   ImGui::End();
 
