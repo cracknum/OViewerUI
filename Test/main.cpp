@@ -31,8 +31,6 @@ public:
     {
       return false;
     }
-    SPDLOG_DEBUG("event: {}", EventIdStr[static_cast<int>(renderEvent->eventId())]);
-    
     std::unordered_map<GLenum, std::string> shaderSources;
     shaderSources[GL_VERTEX_SHADER] = mVertexShaderSource;
     shaderSources[GL_FRAGMENT_SHADER] = mFragmentShaderSource;
@@ -60,16 +58,12 @@ public:
       vertices.m_PointAttribute.first = true;
       vertices.m_PointAttribute.second = 2;
       mVetexIndexBuffer->createBuffer(vertices);
-
-      frameBuffer->updateBufferSize(512, 512);
     }
     shaderProgram->use();
     frameBuffer->bind();
     mVetexIndexBuffer->draw(GL_TRIANGLES);
     frameBuffer->unbind();
     shaderProgram->unuse();
-
-    SPDLOG_DEBUG("draw finished");
 
     return true;
   }

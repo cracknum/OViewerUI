@@ -69,7 +69,11 @@ bool OpenGLViewerWidget::render()
 
 void OpenGLViewerWidget::resize(int width, int height)
 {
-  mPrivate->mFrameBuffer->updateBufferSize(width, height);
+  if (mPrivate->mFrameBuffer->textureWidth() - width != 0 || mPrivate->mFrameBuffer->textureHeight() - height != 0)
+  {
+    mPrivate->mFrameBuffer->updateBufferSize(width, height);
+    SPDLOG_DEBUG("resize framebuffer");
+  }
 }
 
 std::shared_ptr<FrameBuffer> OpenGLViewerWidget::renderBuffer()

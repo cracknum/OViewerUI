@@ -92,7 +92,7 @@ bool OpenGLWindow::init(int width, int height, const std::string& title)
   mPrivate->mOpenGLContext->init(this);
   mPrivate->mUIContext->init(this);
   mPrivate->mSceneView = std::make_shared<SceneView>(mPrivate->mUIContext->GetContext());
-
+  this->addObserver(mPrivate->mSceneView);
   initMenu();
 
   return mPrivate->mIsRunning;
