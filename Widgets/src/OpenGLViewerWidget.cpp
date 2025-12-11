@@ -37,25 +37,8 @@ bool OpenGLViewerWidget::render()
     if (canvasSize.x <= 0 || canvasSize.y <= 0)
       return false;
 
-    // 计算保持宽高比的缩放因子
-    float scale = std::min(canvasSize.x / (float)width, canvasSize.y / (float)height);
-    ImVec2 imageSize = ImVec2(width * scale, height * scale);
-
-    // 获取当前光标位置
-    ImVec2 pos = ImGui::GetCursorScreenPos();
-
-    // 计算居中偏移量
-    float offsetX = (canvasSize.x - imageSize.x) / 2;
-    float offsetY = (canvasSize.y - imageSize.y) / 2;
-
-    // 设置新的光标位置以居中图像
-    ImGui::SetCursorScreenPos(ImVec2(pos.x + offsetX, pos.y + offsetY));
-
     ImTextureID textureId(texture);
-    ImGui::Image(textureId, imageSize, ImVec2(0, 1), ImVec2(1, 0));
-
-    // 恢复原始光标位置（如果需要）
-    ImGui::SetCursorScreenPos(pos);
+    ImGui::Image(textureId, canvasSize, ImVec2(0, 1), ImVec2(1, 0));
 
     if (ImGui::IsWindowHovered())
     {
