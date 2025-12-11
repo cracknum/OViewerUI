@@ -5,7 +5,6 @@ project(RenderFramework)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(CUDAToolkit REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
@@ -23,7 +22,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(frame_work_name ${PROJECT_NAME})
 
 # for spdlog print debug info
-set(ENABLE_DEBUG ON)
+set(ENABLE_DEBUG OFF)
 
 if (ENABLE_DEBUG)
     add_definitions(-DSPDLOG_ACTIVE_LEVEL=1)
