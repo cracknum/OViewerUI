@@ -5,9 +5,9 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 #define STB_IMAGE_IMPLEMENTATION
+#include "MenuBar.h"
 #include "RenderEvent.h"
 #include "RenderEventData.h"
-#include "MenuBar.h"
 
 #include "WidgetEvent.h"
 #include "WidgetEventData.h"
@@ -93,6 +93,10 @@ bool OpenGLWindow::init(int width, int height, const std::string& title)
   mPrivate->mUIContext->init(this);
   mPrivate->mSceneView = std::make_shared<SceneView>(mPrivate->mUIContext->GetContext());
   this->addObserver(mPrivate->mSceneView);
+  this->invokeEvent(
+    WidgetEvent(
+      EventId::WidgetResize,
+      std::make_unique<WidgetResizeData>(ImVec2(width, height))));
   initMenu();
 
   return mPrivate->mIsRunning;
@@ -113,9 +117,7 @@ bool OpenGLWindow::render()
   return true;
 }
 
-void OpenGLWindow::handleInput()
-{
-}
+void OpenGLWindow::handleInput() {}
 
 bool OpenGLWindow::isRunning() const
 {
