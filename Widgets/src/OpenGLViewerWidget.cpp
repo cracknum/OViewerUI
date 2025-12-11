@@ -1,6 +1,8 @@
 #include "OpenGLViewerWidget.h"
+#include "MouseEvent.h"
 #include <imgui.h>
 #include <spdlog/spdlog.h>
+
 
 struct OpenGLViewerWidget::Private
 {
@@ -54,6 +56,11 @@ bool OpenGLViewerWidget::render()
 
     // 恢复原始光标位置（如果需要）
     ImGui::SetCursorScreenPos(pos);
+
+    if (ImGui::IsWindowHovered())
+    {
+      handleInput();
+    }
   }
   ImGui::End();
   ImGui::PopStyleVar(3); // 弹出样式设置
@@ -68,4 +75,62 @@ void OpenGLViewerWidget::resize(int width, int height)
 std::shared_ptr<FrameBuffer> OpenGLViewerWidget::renderBuffer()
 {
   return mPrivate->mFrameBuffer;
+}
+
+void OpenGLViewerWidget::mousePressCheck()
+{
+  if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+  {
+    auto& io = ImGui::GetIO();
+
+    auto buttonPos = io.MouseClickedPos[ImGuiMouseButton_Left];
+    auto eventData = std::make_unique<MousePressedData>(buttonPos, ImGuiMouseButton_Left);
+    this->invokeEvent(MouseEvent(EventId::MousePressed, std::move(eventData)));
+
+    SPDLOG_DEBUG("mouse left button clicked");
+  }
+}
+
+void OpenGLViewerWidget::mouseMoveCheck()
+{
+  auto& io = ImGui::GetIO();
+  if (!ImGui::IsAnyMouseDown() && (fabsf(io.MouseDelta.x) > 1e-6 || fabsf(io.MouseDelta.y) > 1e-6))
+  {
+    ImVec2 mousePos = io.MousePos;
+    ImVec2 preMousePos = io.MousePosPrev;
+
+    auto eventData = std::make_unique<MouseMoveData>(mousePos, preMousePos);
+    this->invokeEvent(MouseEvent(EventId::MouseMove, std::move(eventData)));
+    SPDLOG_DEBUG("mouse move");
+  }
+}
+
+void OpenGLViewerWidget::mouseDragCheck()
+{
+  if (ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+  {
+    auto& io = ImGui::GetIO();
+    ImVec2 accumulateDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
+    auto eventData = std::make_unique<MouseDragData>(accumulateDelta, ImGuiMouseButton_Left);
+    this->invokeEvent(MouseEvent(EventId::MouseDrag, std::move(eventData)));
+
+    SPDLOG_DEBUG("mouse draging");
+  }
+}
+
+void OpenGLViewerWidget::mouseReleaseCheck()
+{
+  if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+  {
+    this->invokeEvent(MouseEvent(EventId::MouseRelease, std::make_unique<MouseReleaseData>()));
+    SPDLOG_DEBUG("mouse left button released");
+  }
+}
+
+void OpenGLViewerWidget::handleInput()
+{
+  mousePressCheck();
+  mouseDragCheck();
+  mouseMoveCheck();
+  mouseReleaseCheck();
 }

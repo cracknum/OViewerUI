@@ -31,11 +31,6 @@ public:
     void exit() override;
     void initMenu();
 
-    void mousePressCheck();
-    void mouseMoveCheck();
-    void mouseDragCheck();
-    void mouseReleaseCheck();
-
 private:
     std::unique_ptr<WindowPrivate> mPrivate;
 };

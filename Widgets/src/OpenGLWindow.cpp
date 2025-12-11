@@ -8,7 +8,7 @@
 #include "RenderEvent.h"
 #include "RenderEventData.h"
 #include "MenuBar.h"
-#include "MouseEvent.h"
+
 #include "WidgetEvent.h"
 #include "WidgetEventData.h"
 #include <GLFW/glfw3.h>
@@ -111,18 +111,11 @@ bool OpenGLWindow::render()
   mPrivate->mUIContext->postRender();
   mPrivate->mOpenGLContext->postRender();
 
-  handleInput();
-
   return true;
 }
 
 void OpenGLWindow::handleInput()
 {
-  mousePressCheck();
-
-  mouseDragCheck();
-  mouseMoveCheck();
-  mouseReleaseCheck();
 }
 
 bool OpenGLWindow::isRunning() const
@@ -227,54 +220,4 @@ void OpenGLWindow::exit()
 {
   mPrivate->mIsRunning = false;
   SPDLOG_DEBUG("RUNNING STATE: {}", mPrivate->mIsRunning);
-}
-
-void OpenGLWindow::mousePressCheck()
-{
-  if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-  {
-    auto& io = ImGui::GetIO();
-
-    auto buttonPos = io.MouseClickedPos[ImGuiMouseButton_Left];
-    auto eventData = std::make_unique<MousePressedData>(buttonPos, ImGuiMouseButton_Left);
-    this->invokeEvent(MouseEvent(EventId::MousePressed, std::move(eventData)));
-
-    SPDLOG_DEBUG("mouse left button clicked");
-  }
-}
-
-void OpenGLWindow::mouseMoveCheck()
-{
-  auto& io = ImGui::GetIO();
-  if (!ImGui::IsAnyMouseDown() && (fabsf(io.MouseDelta.x) > 1e-6 || fabsf(io.MouseDelta.y) > 1e-6))
-  {
-    ImVec2 mousePos = io.MousePos;
-    ImVec2 preMousePos = io.MousePosPrev;
-
-    auto eventData = std::make_unique<MouseMoveData>(mousePos, preMousePos);
-    this->invokeEvent(MouseEvent(EventId::MouseMove, std::move(eventData)));
-    SPDLOG_DEBUG("mouse move");
-  }
-}
-
-void OpenGLWindow::mouseDragCheck()
-{
-  if (ImGui::IsMouseDragging(ImGuiMouseButton_Left))
-  {
-    auto& io = ImGui::GetIO();
-    ImVec2 accumulateDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
-    auto eventData = std::make_unique<MouseDragData>(accumulateDelta, ImGuiMouseButton_Left);
-    this->invokeEvent(MouseEvent(EventId::MouseDrag, std::move(eventData)));
-
-    SPDLOG_DEBUG("mouse draging");
-  }
-}
-
-void OpenGLWindow::mouseReleaseCheck()
-{
-  if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-  {
-    this->invokeEvent(MouseEvent(EventId::MouseRelease, std::make_unique<MouseReleaseData>()));
-    SPDLOG_DEBUG("mouse left button released");
-  }
 }

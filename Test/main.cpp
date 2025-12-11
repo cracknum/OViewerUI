@@ -21,8 +21,8 @@ public:
     : mViewerWidget(viewerWidget)
   {
     mShaderProgramManager = std::make_shared<ShaderProgramManager>();
-    mVertexShaderSource = ShaderUtils::loadShaderSource(R"(F:\Workspace\Projects\imgui_cuda_demo\Test\test.vert)");
-    mFragmentShaderSource = ShaderUtils::loadShaderSource( R"(F:\Workspace\Projects\imgui_cuda_demo\Test\test.frag)");
+    mVertexShaderSource = ShaderUtils::loadShaderSource(R"(D:\Workspace\github\OViewerUI\Test\test.vert)");
+    mFragmentShaderSource = ShaderUtils::loadShaderSource( R"(D:\Workspace\github\OViewerUI\Test\test.frag)");
   }
   bool handle(const EventObject& event) override
   {
