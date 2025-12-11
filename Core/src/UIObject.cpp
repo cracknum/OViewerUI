@@ -8,6 +8,9 @@ void UIObject::invokeEvent(const EventObject& eventObject)
 {
   for (const auto& observer: mObservers)
   {
-    observer->handle(eventObject);
+    if (observer->handle(eventObject))
+    {
+      return;
+    }
   }
 }
